@@ -1,2 +1,2 @@
-# QQ-like-instant-messaging-software
+# Geochat
 软件工程课程作业
