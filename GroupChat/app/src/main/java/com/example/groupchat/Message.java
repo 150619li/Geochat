@@ -1,21 +1,24 @@
 package com.example.groupchat;
+
+import java.util.Date;
+
 public class Message {
-    private String senderId;
+    private String sender;
     private String content;
+    private String groupId;  // 新增 groupId 字段
 
-    // 构造函数
-    public Message(String senderId, String content) {
-        this.senderId = senderId;
+    public Message(String sender, String content, String groupId) {
+        this.sender = sender;
         this.content = content;
+        this.groupId = groupId;
+    }
+    // Getters 和 Setters
+    public String getSender() {
+        return sender;
     }
 
-    // Getter 和 Setter 方法
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
     public String getContent() {
@@ -24,5 +27,13 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

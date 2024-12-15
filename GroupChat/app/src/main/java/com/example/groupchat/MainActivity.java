@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         // 初始化按钮
         loginButton = findViewById(R.id.loginButton);
         registerButton = findViewById(R.id.registerButton);
-        groupListButton = findViewById(R.id.groupListButton);
+        //groupListButton = findViewById(R.id.groupListButton);
 
         // 跳转到登录页面
         loginButton.setOnClickListener(view -> {
@@ -34,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 跳转到群组列表页面
-        groupListButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, GroupListActivity.class);
-            startActivity(intent);
-        });
+        //groupListButton.setOnClickListener(view -> {
+        //    Intent intent = new Intent(MainActivity.this, GroupListActivity.class);
+        //    startActivity(intent);
+        //});
     }
 }

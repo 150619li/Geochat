@@ -1,22 +1,22 @@
 package com.example.groupchat;
 
 public class LoginRequest {
-    private String username;
+    private String useremail;
     private String password;
 
     // 构造函数
-    public LoginRequest(String username, String password) {
-        this.username = username;
+    public LoginRequest(String useremail, String password) {
+        this.useremail= useremail;
         this.password = password;
     }
 
     // Getter 和 Setter 方法
-    public String getUsername() {
-        return username;
+    public String getUseremail() {
+        return useremail;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUseremail(String useremail) {
+        this.useremail = useremail;
     }
 
     public String getPassword() {

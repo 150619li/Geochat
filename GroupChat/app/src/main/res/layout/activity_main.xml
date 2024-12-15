@@ -22,11 +22,11 @@
         android:text="注册" />
 
     <!-- 群组列表按钮 -->
-    <Button
+    <!--Button
         android:id="@+id/groupListButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="群组列表" />
+        android:text="群组列表" /-->
 
 </LinearLayout>

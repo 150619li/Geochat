@@ -3,6 +3,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,11 +29,9 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat);
-
         messageRecyclerView = findViewById(R.id.messageRecyclerView);
         messageEditText = findViewById(R.id.messageEditText);
         sendButton = findViewById(R.id.sendButton);
-
 
         // 初始化 RecyclerView
         messageRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -52,11 +52,11 @@ public class ChatActivity extends AppCompatActivity {
 
         // 使用 groupId 加载聊天内容
         loadMessages(groupId);
-
+        String sender="10";
         sendButton.setOnClickListener(view -> {
             String messageContent = messageEditText.getText().toString().trim();
             if (!messageContent.isEmpty()) {
-                sendMessage(messageContent,groupId);
+                sendMessage(sender,messageContent,groupId);
             } else {
                 Toast.makeText(ChatActivity.this, "消息不能为空", Toast.LENGTH_SHORT).show();
             }
@@ -75,30 +75,27 @@ public class ChatActivity extends AppCompatActivity {
                     Toast.makeText(ChatActivity.this, "无法加载消息", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<List<Message>> call, Throwable t) {
                 Toast.makeText(ChatActivity.this, "加载消息失败：" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
-    private void sendMessage(String messageContent,String groupId) {
-        Message message = new Message("user_id_here", messageContent); // 替换为实际的用户 ID
-        apiService.sendMessage(groupId, message).enqueue(new Callback<Void>() {
+    private void sendMessage(String sender,String messageContent,String groupId) {
+        Message message = new Message(sender, messageContent,groupId); // 替换为实际的用户 ID
+        apiService.sendMessage(groupId,message).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(ChatActivity.this, "消息已发送", Toast.LENGTH_SHORT).show();
-                    messageEditText.setText(""); // 清空输入框
-                    loadMessages(groupId); // 重新加载消息
+                    Toast.makeText(ChatActivity.this, "Message sent successfully", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(ChatActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "Failed to send message", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(ChatActivity.this, "发送失败：" + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Toast.makeText(ChatActivity.this, "Network error", Toast.LENGTH_SHORT).show();
             }
         });
     }
