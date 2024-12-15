@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   is_superuser: { type: Boolean, default: false },
+  user_in_groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }], // 用户加入的所有群聊
   poi: { 
     lat: { type: Number, required: true },
     lon: { type: Number, required: true }

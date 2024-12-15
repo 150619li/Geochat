@@ -102,4 +102,17 @@ router.post('/updateLocation', async (req, res) => {
   }
 });
 
+// 获取用户加入的所有群聊
+router.get('/:userId/groups', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate('user_in_groups');
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    res.status(200).json(user.user_in_groups);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
 module.exports = router;
