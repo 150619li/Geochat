@@ -1,5 +1,5 @@
 const express = require('express');
-const Group = require('../models/group');
+const Group = require('../models/Group');
 const Message = require('../models/message');
 const User = require('../models/user');
 const router = express.Router();
@@ -7,13 +7,13 @@ const router = express.Router();
 // 创建群聊
 router.post('/create', async (req, res) => {
   try {
-    const { name, members } = req.body;
+    const { group_name, memberID, lat, lon, radius } = req.body;
     // 验证用户ID是否有效
-    const validMembers = await User.find({ _id: { $in: members } });
-    if (validMembers.length !== members.length) {
+    const validMembers = await User.find({ _id: { $in: memberID } });
+    if (validMembers.length !== memberID.length) {
       return res.status(400).send('One or more user IDs are invalid');
     }
-    const newGroup = new Group({ name, members });
+    const newGroup = new Group({ groupID: new mongoose.Types.ObjectId(), group_name, memberID, lat, lon, radius });
     await newGroup.save();
     res.status(201).send('Group created successfully');
   } catch (error) {
@@ -25,30 +25,19 @@ router.post('/create', async (req, res) => {
 router.post('/:groupId/addMember', async (req, res) => {
   try {
     const { groupId } = req.params;
-    const { memberId } = req.body;
-
-    //console.log(`Adding member ${memberId} to group ${groupId}`);
-
-    // 验证用户ID是否有效
-    const user = await User.findById(memberId);
-    if (!user) {
-      return res.status(400).send('Invalid user ID');
-    }
-
-    // 更新群聊成员列表
-    const group = await Group.findByIdAndUpdate(
-      groupId,
-      { $addToSet: { members: memberId } },
-      { new: true }
-    );
+    const { memberID } = req.body;
+    const group = await Group.findById(groupId);
     if (!group) {
-      //console.log(`Group not found: ${groupId}`);
       return res.status(404).send('Group not found');
     }
-    //console.log(`Member ${memberId} added to group ${groupId} successfully`);
+    const user = await User.findById(memberID);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    group.memberID.push(memberID);
+    await group.save();
     res.status(200).send('Member added successfully');
   } catch (error) {
-    //console.error('Error adding member:', error);
     res.status(400).send(error.message);
   }
 });
@@ -57,24 +46,13 @@ router.post('/:groupId/addMember', async (req, res) => {
 router.post('/:groupId/removeMember', async (req, res) => {
   try {
     const { groupId } = req.params;
-    const { memberId } = req.body;
-
-    // 验证用户ID是否有效
-    const user = await User.findById(memberId);
-    if (!user) {
-      return res.status(400).send('Invalid user ID');
-    }
-
-    // 更新群聊成员列表
-    const group = await Group.findByIdAndUpdate(
-      groupId,
-      { $pull: { members: memberId } },
-      { new: true }
-    );
+    const { memberID } = req.body;
+    const group = await Group.findById(groupId);
     if (!group) {
       return res.status(404).send('Group not found');
     }
-
+    group.memberID = group.memberID.filter(id => id.toString() !== memberID);
+    await group.save();
     res.status(200).send('Member removed successfully');
   } catch (error) {
     res.status(400).send(error.message);
@@ -85,10 +63,7 @@ router.post('/:groupId/removeMember', async (req, res) => {
 router.get('/:groupId/messages', async (req, res) => {
   try {
     const { groupId } = req.params;
-    const group = await Group.findById(groupId).populate({
-      path: 'messages',
-      populate: { path: 'sender', select: 'username' }
-    });
+    const group = await Group.findById(groupId).populate('messages');
     if (!group) {
       return res.status(404).send('Group not found');
     }
@@ -102,10 +77,9 @@ router.get('/:groupId/messages', async (req, res) => {
 router.post('/:groupId/messages', async (req, res) => {
   try {
     const { groupId } = req.params;
-    const { sender, content } = req.body;
-    
+    const { userID_send, message_text } = req.body;
     // 验证用户ID
-    const user = await User.findById(sender);
+    const user = await User.findById(userID_send);
     if (!user) {
       return res.status(400).send('Invalid user ID');
     }
@@ -116,14 +90,29 @@ router.post('/:groupId/messages', async (req, res) => {
       return res.status(400).send('Invalid group ID');
     }
 
-    const newMessage = new Message({ group: groupId, sender, content });
+    const newMessage = new Message({ groupID: groupId, userID_send, message_text });
     await newMessage.save();
 
     // 将消息ID添加到群聊的消息列表中
     group.messages.push(newMessage._id);
     await group.save();
-    
+
     res.status(201).send('Message sent successfully');
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+// 获取群聊经纬度和半径
+router.get('/:groupId/location', async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).send('Group not found');
+    }
+    const { lat, lon, radius } = group;
+    res.status(200).json({ lat, lon, radius });
   } catch (error) {
     res.status(400).send(error.message);
   }
