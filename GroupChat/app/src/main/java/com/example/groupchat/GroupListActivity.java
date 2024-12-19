@@ -26,7 +26,7 @@ public class GroupListActivity extends AppCompatActivity {
     private ApiService apiService= ApiClient.getRetrofitInstance().create(ApiService.class);
     private List<Group> groupList = new ArrayList<>();
     private ArrayAdapter<String> groupAdapter;
-
+    private String UserId = getIntent().getStringExtra("UserId");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +39,7 @@ public class GroupListActivity extends AppCompatActivity {
         groupListView.setAdapter(groupAdapter);
 
         // 加载群组数据
-        loadGroups();
+        loadGroups(UserId);
 
         createGroupButton.setOnClickListener(view -> {
             // 创建群组逻辑
@@ -98,7 +98,7 @@ public class GroupListActivity extends AppCompatActivity {
 
     private void createGroup(String groupName ,String groupID) {
         // 创建群组对象
-        Group group = new Group(groupID , groupName, null); // 假设不需要额外的成员列表
+        Group group = new Group(groupName, null); // 假设不需要额外的成员列表
 
         // 调用 API 创建群组
         apiService.createGroup(group).enqueue(new Callback<Void>() {
@@ -106,7 +106,7 @@ public class GroupListActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(GroupListActivity.this, "群组创建成功", Toast.LENGTH_SHORT).show();
-                    // 刷新群组列表（假设有刷新逻辑）
+                    loadGroups(UserId);
                 } else {
                     Toast.makeText(GroupListActivity.this, "群组创建失败", Toast.LENGTH_SHORT).show();
                 }
@@ -118,8 +118,8 @@ public class GroupListActivity extends AppCompatActivity {
             }
         });
     }
-    private void loadGroups() {
-        apiService.getGroups().enqueue(new Callback<List<Group>>() {
+    private void loadGroups(String UserId) {
+        apiService.getGroups(UserId).enqueue(new Callback<List<Group>>() {
             @Override
             public void onResponse(Call<List<Group>> call, Response<List<Group>> response) {
                 if (response.isSuccessful() && response.body() != null) {

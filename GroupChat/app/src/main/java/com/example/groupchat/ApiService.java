@@ -12,11 +12,11 @@ public interface ApiService {
     Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
     @POST("/api/groups/create")
     Call<Void> createGroup(@Body Group group);
-    @GET("/api/groups/{groupId}/messages")
+    @GET("/api/messages/:groupId/messages")
     Call<List<Message>>getGroupMessages(@Path("groupId") String groupId);
-    @POST("/api/groups/{groupId}/messages")
-    Call<Void>sendMessage(@Path("groupId") String groupId, @Body Message message);
+    @POST("/api/messages/:groupId/messages")
+    Call<Void>sendMessage(@Path("groupId") String groupId,@Body Message message);
     @GET("/api/groups")
-    Call<List<Group>> getGroups();
+    Call<List<Group>> getGroups(@Path("UserId") String UserId);
 
 }

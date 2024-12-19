@@ -6,10 +6,9 @@ public class Group {
     private String groupId;
     private List<String> members; // 可选字段，用于添加成员列表
 
-    public Group(String groupId,String groupName, List<String> members) {
+    public Group(String groupName, List<String> members) {
         this.groupName = groupName;
         this.members = members;
-        this.groupId = groupId;
     }
 
     public String getGroupId() {

@@ -2,6 +2,7 @@ package com.example.groupchat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -39,16 +40,22 @@ public class LoginActivity extends AppCompatActivity {
             apiService.loginUser(loginRequest).enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+
                     if (response.isSuccessful()) {
                         if (response.body() != null) {
                             String token = response.body().getToken();
                         }
                         Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                        String UserId = response.body().getToken();
                         Intent intent = new Intent(LoginActivity.this, GroupListActivity.class);
+                        intent.putExtra("UserId", UserId);
                         startActivity(intent);
                         finish();
                     } else {
                         Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(LoginActivity.this, GroupListActivity.class);
+                        startActivity(intent);
                     }
                 }
 
