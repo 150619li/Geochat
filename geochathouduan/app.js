@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const userRouter = require('./routes/user');
 const groupRouter = require('./routes/group');
 const messageRouter = require('./routes/message');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -10,6 +11,7 @@ const port = process.env.PORT || 5000;
 
 // 中间件
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 连接MongoDB
 mongoose.connect(process.env.MONGODB_URI)
