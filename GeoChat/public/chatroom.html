@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>chatroom</title>
+  <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+  <div class="container">
+    <h1>send message to your friends</h1>
+    <div id="chat-list">
+        <p>Loading messages...</p>
+    </div>
+    <form id="send-message-form">
+        <input type="text" id="message" placeholder="消息" required><br>
+        <button type="send">发送</button>
+    </form>
+    <button id="change groups">change groups</button>
+  </div>
+    <script>
+     async function getGroupmessages() {
+         const token = localStorage.getItem('token');
+         const groupid = localStorage.getItem('groupid');
+         const chatListContainer = document.getElementById('chat-list');
+         if (!token) {
+            window.location.href = 'login.html';
+            return;
+         }
+         try {
+            const response = await fetch(`/api/groups/${groupid}/messages`, {
+              method: 'GET',
+              headers: {
+                 'Authorization': `Bearer ${token}`
+              }
+            });
+            if (response.ok) {
+              const messages = await response.json();
+              chatListContainer.innerHTML = '';
+              if (messages.length === 0) {
+                 chatListContainer.innerHTML = '<p>There are no messages in this group yet.</p>';
+                 return;
+              }
+              messages.forEach(message => {
+                 const messageElement = document.createElement('div');
+                 messageElement.classList.add('message');
+                 messageElement.innerHTML = `
+                <h3>${message.sender}</h3>
+                <p>${message.text}</p>
+                 `;
+                 chatListContainer.appendChild(messageElement);
+              });
+            } else {
+              chatListContainer.innerHTML = '<p>Failed to load messages. Please try again later.</p>';
+            }
+         } catch (error) {
+            console.error('Error:', error);
+            chatListContainer.innerHTML = '<p>Failed to load messages. Please try again later.</p>';
+         }
+     }
+     document.getElementById('change groups').addEventListener('click', () => {
+       localStorage.removeItem('groupid'); 
+       window.location.href = 'chat.html'; 
+     });
+     getGroupmessages();
+
+     document.getElementById('send-message-form').addEventListener('send', async (e) => {
+       e.preventDefault();
+       const token = localStorage.getItem('token');
+       const groupid = localStorage.getItem('groupid');
+       const message = document.getElementById('message').value;
+       const data = {
+         message
+       };
+       try {
+         const response = await fetch(`/api/groups/${groupid}/messages`, {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             'Authorization': `Bearer ${token}`
+           },
+           body: JSON.stringify(data)
+         });
+         const result = await response.text();
+         if (response.ok) {
+           alert(result);
+           getGroupmessages();
+         } else {
+           alert(result);
+         }
+       } catch (error) {
+         console.error('Error:', error);
+         alert('Failed to send message. Please try again later.');
+       }
+     });
+
+
+    </script>
+</body>
+</html>
