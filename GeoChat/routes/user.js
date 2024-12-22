@@ -8,13 +8,14 @@ const router = express.Router();
 // 用户注册路由
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password} = req.body;
+    const { username, email, password, lat, lon  } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10); // 加密密码
     const newUser = new User({ 
       userID: new mongoose.Types.ObjectId(),
       username,
       email,
       password: hashedPassword,
+      poi: { lat, lon }
     });
     await newUser.save();
     res.status(201).send('User registered successfully');

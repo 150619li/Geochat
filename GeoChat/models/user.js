@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema({
   is_superuser: { type: Boolean, default: false },
   user_in_groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }], // 用户加入的所有群聊
   poi: { 
-    lat: { type: Number },
-    lon: { type: Number }
+    lat: { type: Number, required: true},
+    lon: { type: Number, required: true}
    },
   profile: { type: String }, //图片的url
   care: [{
