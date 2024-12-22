@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map Groups</title>
+  <!-- 引入高德地图的API -->
+  <script src="https://webapi.amap.com/maps?v=1.4.15&key=9b0a7cf1d837970efd526099bf30b07e"></script>
+  <style>
+    /* 设置地图的高度为视口高度，充满整个页面 */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100vh; /* 设置地图充满整个页面 */
+    }
+
+    h1 {
+      font-size: 24px; /* 调整标题字体大小 */
+      text-align: center;
+      padding: 10px 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      margin: 0;
+    }
+
+    .container {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      z-index: 10; /* 确保标题在地图之上 */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Map Groups</h1>
+    <div id="map">
+      <!-- 高德地图将会在这里渲染 -->
+    </div>
+  </div>
+  <script>
+    function initializeMap(groups) {
+      // 默认中心坐标（例如世界中心）
+      let mapCenter = [0, 0];
+      let mapZoom = 2;
+
+      // 如果有组，使用第一个组的位置作为中心
+      if (groups.length > 0 && groups[0].latitude && groups[0].longitude) {
+        mapCenter = [groups[0].latitude, groups[0].longitude];
+        mapZoom = 5;
+      }
+
+      // 初始化高德地图
+      const map = new AMap.Map('map', {
+        center: mapCenter,
+        zoom: mapZoom,
+        mapStyle: 'amap://styles/normal',  // 设置地图样式
+      });
+
+      // 添加标记
+      groups.forEach(group => {
+        if (group.latitude && group.longitude) {
+          const marker = new AMap.Marker({
+            position: [group.longitude, group.latitude],
+            title: group.name,
+          });
+
+          marker.setMap(map);
+
+          // 添加点击事件，跳转到chatroom.html
+          marker.on('click', () => {
+            const userConfirmed = confirm(`Do you want to join the group: ${group.name}?`);
+
+            if (userConfirmed) {
+                // 用户点击“确认”，跳转到群聊页面
+                window.location.href = `chatroom.html?groupId=${group._id}`;
+            }
+            });
+        }
+      });
+
+      // 调整视图以适应所有标记
+      const groupCoords = groups
+        .filter(group => group.latitude && group.longitude)
+        .map(group => [group.longitude, group.latitude]);
+
+      if (groupCoords.length > 0) {
+        map.setFitView();
+      }
+    }
+    try {
+        // Fetch groups from backend using token for authentication
+        const response = await fetch(`/api/groups/all`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          const groups = await response.json(); // Assuming the response is a list of groups
+            initializeMap(groups);
+        } else {
+            alert('附近没有群组信息');
+        }
+    } 
+    catch (error) {
+        console.error(error);
+        alert('附近没有群组信息');
+    }
+    initializeMap(groups);
+  </script>
+</body>
+</html>

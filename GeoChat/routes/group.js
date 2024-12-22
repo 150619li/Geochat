@@ -38,6 +38,16 @@ router.post('/create', async (req, res) => {
   }
 });
 
+router.get('/all', async (req, res) => {
+  try {
+    const groups = await Group.find();
+    res.status(200).json(groups);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+
 // 添加群成员
 router.post('/:groupId/addMember', async (req, res) => {
   try {
