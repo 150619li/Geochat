@@ -2,99 +2,310 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>chatroom</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chatroom</title>
+  <!-- 引入CSS样式 -->
   <link rel="stylesheet" href="styles.css"> 
+  <!-- 引入jwt-decode库 -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+  <style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 设置页面高度和背景 */
+body {
+  height: 100vh; /* 视口高度 */
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center;     /* 垂直居中 */
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  font-family: Arial, sans-serif;
+}
+
+/* 容器样式 */
+.container {
+  background-color: #ffffff;
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 700px;
+}
+
+/* 标题样式 */
+.container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333333;
+}
+
+/* 聊天列表样式 */
+#chat-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 10px;
+}
+
+/* 单个消息的样式 */
+.message {
+  background-color: #f1f1f1;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.message h3 {
+  margin-bottom: 5px;
+  color: #007bff;
+  font-size: 16px;
+}
+
+.message p {
+  color: #555555;
+  font-size: 14px;
+}
+
+/* 消息发送表单样式 */
+#send-message-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#send-message-form input[type="text"] {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+#send-message-form input[type="text"]:focus {
+  border-color: #66afe9;
+  outline: none;
+}
+
+#send-message-form button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#send-message-form button:hover {
+  background-color: #218838;
+}
+
+/* 更改群组按钮样式 */
+#change-groups {
+  width: 100%;
+  padding: 12px;
+  background-color: #17a2b8;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#change-groups:hover {
+  background-color: #138496;
+}
+
+/* 加载指示器样式 */
+.spinner {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #007bff; /* Blue */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+/* 旋转动画 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 响应式设计 */
+@media (max-width: 750px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  #send-message-form {
+    flex-direction: column;
+  }
+
+  #send-message-form button {
+    width: 100%;
+  }
+
+  #change-groups {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>send message to your friends</h1>
+    <h1>Send Message to Your Friends</h1>
     <div id="chat-list">
-        <p>Loading messages...</p>
+      <div class="spinner" id="loading-indicator"></div>
     </div>
     <form id="send-message-form">
-        <input type="text" id="message" placeholder="消息" required><br>
-        <button type="send">发送</button>
+      <input type="text" id="message" placeholder="消息" required>
+      <button type="submit">发送</button>
     </form>
-    <button id="change groups">change groups</button>
+    <button id="change-groups">Change Groups</button>
   </div>
-    <script>
-     async function getGroupmessages() {
-         const token = localStorage.getItem('token');
-         const groupid = localStorage.getItem('groupid');
-         const chatListContainer = document.getElementById('chat-list');
-         if (!token) {
-            window.location.href = 'login.html';
+
+  <script>
+    // Function to fetch and display group's messages
+    async function getGroupMessages() {
+      const token = localStorage.getItem('token'); // Get the JWT token from localStorage
+      const groupId = localStorage.getItem('groupid'); // Get the selected group ID
+      const chatListContainer = document.getElementById('chat-list');
+      const loadingIndicator = document.getElementById('loading-indicator');
+
+      if (!token) {
+        window.location.href = 'login.html'; // Redirect to login page if no token
+        return;
+      }
+
+      let decodedToken;
+      try {
+        decodedToken = jwt_decode(token);
+      } catch (err) {
+        console.error('Invalid token:', err);
+        alert('无效的令牌，请重新登录。');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Optionally, you can use decodedToken.userId if needed
+      // const userId = decodedToken.userId;
+
+      if (!groupId) {
+        chatListContainer.innerHTML = '<p>No group selected. Please select a group.</p>';
+        return;
+      }
+
+      try {
+        // Fetch messages from backend using token for authentication
+        const response = await fetch(`/api/groups/${groupId}/messages`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const messages = await response.json(); // Assuming the response is a list of messages
+          chatListContainer.innerHTML = ''; // Clear loading indicator
+
+          if (messages.length === 0) {
+            chatListContainer.innerHTML = '<p>There are no messages in this group yet.</p>';
             return;
-         }
-         try {
-            const response = await fetch(`/api/groups/${groupid}/messages`, {
-              method: 'GET',
-              headers: {
-                 'Authorization': `Bearer ${token}`
-              }
-            });
-            if (response.ok) {
-              const messages = await response.json();
-              chatListContainer.innerHTML = '';
-              if (messages.length === 0) {
-                 chatListContainer.innerHTML = '<p>There are no messages in this group yet.</p>';
-                 return;
-              }
-              messages.forEach(message => {
-                 const messageElement = document.createElement('div');
-                 messageElement.classList.add('message');
-                 messageElement.innerHTML = `
-                <h3>${message.sender}</h3>
-                <p>${message.text}</p>
-                 `;
-                 chatListContainer.appendChild(messageElement);
-              });
-            } else {
-              chatListContainer.innerHTML = '<p>Failed to load messages. Please try again later.</p>';
-            }
-         } catch (error) {
-            console.error('Error:', error);
-            chatListContainer.innerHTML = '<p>Failed to load messages. Please try again later.</p>';
-         }
-     }
-     document.getElementById('change groups').addEventListener('click', () => {
-       localStorage.removeItem('groupid'); 
-       window.location.href = 'chat.html'; 
-     });
-     getGroupmessages();
+          }
 
-     document.getElementById('send-message-form').addEventListener('send', async (e) => {
-       e.preventDefault();
-       const token = localStorage.getItem('token');
-       const groupid = localStorage.getItem('groupid');
-       const message = document.getElementById('message').value;
-       const data = {
-         message
-       };
-       try {
-         const response = await fetch(`/api/groups/${groupid}/messages`, {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Bearer ${token}`
-           },
-           body: JSON.stringify(data)
-         });
-         const result = await response.text();
-         if (response.ok) {
-           alert(result);
-           getGroupmessages();
-         } else {
-           alert(result);
-         }
-       } catch (error) {
-         console.error('Error:', error);
-         alert('Failed to send message. Please try again later.');
-       }
-     });
+          // Create and display the messages
+          messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = `
+              <h3>${message.sender}</h3>
+              <p>${message.text}</p>
+            `;
+            chatListContainer.appendChild(messageElement);
+          });
+        } else if (response.status === 401) {
+          // Unauthorized, token might be expired or invalid
+          alert('身份验证失败，请重新登录。');
+          window.location.href = 'login.html';
+        } else {
+          chatListContainer.innerHTML = '<p>Failed to load messages. Please try again later.</p>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        chatListContainer.innerHTML = '<p>Failed to load messages. Please try again later.</p>';
+      }
+    }
 
+    // Logout function
+    document.getElementById('change-groups').addEventListener('click', () => {
+      localStorage.removeItem('groupid'); 
+      window.location.href = 'grouplist.html'; // Redirect to group list page
+    });
 
-    </script>
+    // Fetch group messages when page loads
+    getGroupMessages();
+
+    // Handle message sending
+    document.getElementById('send-message-form').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevent the default form submission
+
+      const token = localStorage.getItem('token');
+      const groupId = localStorage.getItem('groupid');
+      const messageInput = document.getElementById('message');
+      const message = messageInput.value.trim();
+
+      if (!message) {
+        alert('请填写消息内容。');
+        return;
+      }
+
+      const data = {
+        text: message, // Assuming the backend expects 'text' field
+      };
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          const result = await response.json(); // Assuming the response returns the created message
+          // Optionally, you can append the new message without refetching all messages
+          /*
+          const messageElement = document.createElement('div');
+          messageElement.classList.add('message');
+          messageElement.innerHTML = `
+            <h3>${result.sender}</h3>
+            <p>${result.text}</p>
+          `;
+          chatListContainer.appendChild(messageElement);
+          */
+          messageInput.value = ''; // Clear the input field
+          getGroupMessages(); // Refresh the message list
+        } else {
+          const errorText = await response.text();
+          alert(`发送失败: ${errorText}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to send message. Please try again later.');
+      }
+    });
+  </script>
 </body>
 </html>
