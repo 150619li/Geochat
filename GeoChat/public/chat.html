@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Chat Groups</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Optional: Add your CSS for styling -->
+</head>
+<body>
+  <div class="container">
+    <h1>Your Chat Groups</h1>
+    <div id="group-list">
+      <!-- The groups will be displayed here dynamically -->
+      <p>Loading your groups...</p>
+    </div>
+    <button id="logout-btn">Log Out</button>
+  </div>
+
+  <script>
+    // Function to fetch and display user's groups
+    async function fetchUserGroups() {
+      const token = localStorage.getItem('token'); // Get the JWT token from localStorage
+
+      if (!token) {
+        window.location.href = 'login.html'; // Redirect to login page if no token
+        return;
+      }
+
+      const userId = 'YOUR_USER_ID'; // Replace with actual userId, or extract from JWT token if possible
+      const groupListContainer = document.getElementById('group-list');
+      
+      try {
+        // Fetch groups from backend using token for authentication
+        const response = await fetch(`/api/${userId}/groups`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const groups = await response.json(); // Assuming the response is a list of groups
+          groupListContainer.innerHTML = ''; // Clear loading text
+          
+          if (groups.length === 0) {
+            groupListContainer.innerHTML = '<p>You are not a member of any groups yet.</p>';
+            return;
+          }
+
+          // Create and display the group list
+          groups.forEach(group => {
+            const groupElement = document.createElement('div');
+            groupElement.classList.add('group');
+            groupElement.innerHTML = `
+              <h3>${group.name}</h3>
+              <p>${group.description || 'No description available'}</p>
+              <a href="chatroom.html?groupId=${group._id}">Go to Chat</a>
+            `;
+            groupListContainer.appendChild(groupElement);
+          });
+        } else {
+          groupListContainer.innerHTML = '<p>Failed to load your groups. Please try again later.</p>';
+        }
+      } catch (error) {
+        console.error(error);
+        groupListContainer.innerHTML = '<p>There was an error loading your groups.</p>';
+      }
+    }
+
+    // Logout function
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('token'); // Remove the token
+      window.location.href = 'login.html'; // Redirect to login page
+    });
+
+    // Fetch user groups when page loads
+    fetchUserGroups();
+  </script>
+</body>
+</html>
