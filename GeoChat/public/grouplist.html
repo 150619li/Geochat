@@ -16,6 +16,7 @@
       <!-- The groups will be displayed here dynamically -->
       <p>Loading your groups...</p>
     </div>
+    <button id="create-group">Create Group</button>
     <button id="logout-btn">Log Out</button>
   </div>
 
@@ -72,6 +73,10 @@
         groupListContainer.innerHTML = '<p>There was an error loading your groups.</p>';
       }
     }
+
+    document.getElementById('create-group').addEventListener('click', () => {
+      window.location.href = 'creategroup.html';
+    });
 
     // Logout function
     document.getElementById('logout-btn').addEventListener('click', () => {

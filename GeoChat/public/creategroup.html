@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Group</title>
+</head>
+<body>
+  <h2>Create a New Group</h2>
+  <form id="create-group-form">
+    <label for="group-name">Group Name:</label>
+    <input type="text" id="group-name" placeholder="Enter group name" required><br>
+
+    <label for="lat">Latitude:</label>
+    <input type="text" id="lat" placeholder="Enter latitude" required><br>
+
+    <label for="lon">Longitude:</label>
+    <input type="text" id="lon" placeholder="Enter longitude" required><br>
+
+    <label for="radius">Radius:</label>
+    <input type="text" id="radius" placeholder="Enter radius" required><br>
+
+    <button type="submit">Create Group</button>
+  </form>
+
+  <button id="logout-btn">Logout</button>
+
+  <script>
+    // Create group function
+    document.getElementById('create-group-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const groupName = document.getElementById('group-name').value;
+      const lat = document.getElementById('lat').value;
+      const lon = document.getElementById('lon').value;
+      const radius = document.getElementById('radius').value;
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You must be logged in to create a group.');
+        return;
+      }
+
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
+
+      const response = await fetch('/api/groups/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          group_name: groupName,
+          memberID: ['1'],
+          lat: lat,
+          lon: lon,
+          radius: radius
+        })
+      });
+
+      console.log(response)
+
+      const data = await response.text();
+
+      if (response.ok) {
+        // Assuming the group creation was successful
+        alert('Group created successfully!');
+        window.location.href = 'chatroom.html'; // Redirect to chatroom after creating the group
+      } else {
+        alert(`Error: ${data.message || 'Something went wrong'}`);
+      }
+    });
+
+    // Logout function
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('token'); // Remove the token
+      window.location.href = 'login.html'; // Redirect to login page
+    });
+  </script>
+</body>
+</html>

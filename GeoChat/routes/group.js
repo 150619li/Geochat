@@ -42,7 +42,6 @@ router.post('/create', async (req, res) => {
     });
 
     await newGroup.save();
-    console.log('Group created successfully');
     res.status(201).send('Group created successfully');
   } catch (error) {
     res.status(400).send(error.message);
