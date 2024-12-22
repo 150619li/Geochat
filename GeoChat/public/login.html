@@ -29,14 +29,13 @@
                 },
                 body: JSON.stringify({ email, password }) 
             });
-
-            const data = await response.text();
             
             if (response.ok) {
+                const data = await response.json();
                 localStorage.setItem('token', data.token);  // 将token存储到localStorage
-                alert(data);
-                window.location.href = 'chat.html';  // 登录成功后跳转到聊天页面
+                window.location.href = 'grouplist.html';  // 登录成功后跳转到聊天页面
             } else {
+                const data = await response.text();
                 alert(data);  // 显示服务器返回的错误信息
             }
         } catch (error) {

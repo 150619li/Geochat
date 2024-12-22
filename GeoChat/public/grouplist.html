@@ -1,10 +1,13 @@
 <!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Chat Groups</title>
-  <link rel="stylesheet" href="styles.css"> <!-- Optional: Add your CSS for styling -->
+  <!-- <link rel="stylesheet" href="styles.css">  -->
+  <!-- Optional: Add your CSS for styling -->
 </head>
 <body>
   <div class="container">
@@ -26,17 +29,20 @@
         return;
       }
 
-      const userId = 'YOUR_USER_ID'; // Replace with actual userId, or extract from JWT token if possible
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
       const groupListContainer = document.getElementById('group-list');
       
       try {
         // Fetch groups from backend using token for authentication
-        const response = await fetch(`/api/${userId}/groups`, {
+        const response = await fetch(`/api/users/${userId}/groups`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
+
+        console.log(response);
 
         if (response.ok) {
           const groups = await response.json(); // Assuming the response is a list of groups
