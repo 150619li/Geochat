@@ -8,7 +8,7 @@ const router = express.Router();
 // 创建群聊
 router.post('/create', async (req, res) => {
   try {
-    const { group_name, memberID, lat, lon, radius } = req.body;
+    const { group_name, lat, lon, radius } = req.body;
 
      // 验证 group_name 是否为空
      if (!group_name) {
@@ -20,22 +20,10 @@ router.post('/create', async (req, res) => {
      if (existingGroup) {
        return res.status(400).send('Group name already exists');
      }
-     
-    // 验证 memberID 是否为数组
-    if (!Array.isArray(memberID)) {
-      return res.status(400).send('memberID should be an array');
-    }
-
-    // 验证用户ID是否有效
-    const validMembers = await User.find({ _id: { $in: memberID } });
-    if (validMembers.length !== memberID.length) {
-      return res.status(400).send('One or more user IDs are invalid');
-    }
 
     const newGroup = new Group({ 
       groupID: new mongoose.Types.ObjectId(), 
       group_name, 
-      memberID, 
       lat, 
       lon, 
       radius 
