@@ -107,13 +107,6 @@
       color: #218838;
     }
 
-    /* Map container styles */
-    #map {
-      flex: 1;
-      height: 500px; /* Fixed height for the map */
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
 
     /* Logout and Create Group buttons */
     .buttons {
@@ -150,16 +143,6 @@
       background-color: #c82333;
     }
 
-    /* Responsive Design */
-    @media (max-width: 1000px) {
-      .content {
-        flex-direction: column;
-      }
-
-      #map {
-        height: 300px;
-      }
-    }
 
     @media (max-width: 650px) {
       .container {
@@ -175,9 +158,6 @@
         padding: 10px;
       }
 
-      #map {
-        height: 250px;
-      }
     }
   </style>
 </head>
@@ -188,16 +168,13 @@
       <!-- The groups will be displayed here dynamically -->
       <p>Loading your groups...</p>
     </div>
-    <div id="map">
-      <!-- Leaflet map will be rendered here -->
-    </div>
   </div>
   <div class="buttons">
     <button id="create-group">Create Group</button>
+    <button id="search-group">Search Group</button>
     <button id="logout-btn">Log Out</button>
     <button id="locate">Refresh Location</button>
   </div>
-</div>
 <!-- Leaflet JS -->
 <script
 src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -306,7 +283,9 @@ crossorigin=""
     document.getElementById('create-group').addEventListener('click', () => {
       window.location.href = 'creategroup.html';
     });
-
+    document.getElementById('search-group').addEventListener('click', () => {
+      window.location.href = 'mapgroup.html';
+    });
     // Logout function
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('token'); // Remove the token
