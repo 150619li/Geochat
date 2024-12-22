@@ -178,7 +178,8 @@ body {
     // Function to fetch and display group's messages
     async function getGroupMessages() {
       const token = localStorage.getItem('token'); // Get the JWT token from localStorage
-      const groupId = localStorage.getItem('groupid'); // Get the selected group ID
+      const urlParams = new URLSearchParams(window.location.search);
+      const groupId = urlParams.get('groupId');
       const chatListContainer = document.getElementById('chat-list');
       const loadingIndicator = document.getElementById('loading-indicator');
 
@@ -228,8 +229,8 @@ body {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message');
             messageElement.innerHTML = `
-              <h3>${message.sender}</h3>
-              <p>${message.text}</p>
+              <h3>${message.message_text}</h3>
+              <p>${message.userID_send}</p>
             `;
             chatListContainer.appendChild(messageElement);
           });
@@ -260,7 +261,8 @@ body {
       e.preventDefault(); // Prevent the default form submission
 
       const token = localStorage.getItem('token');
-      const groupId = localStorage.getItem('groupid');
+      const urlParams = new URLSearchParams(window.location.search);
+      const groupId = urlParams.get('groupId');
       const messageInput = document.getElementById('message');
       const message = messageInput.value.trim();
 
@@ -268,13 +270,16 @@ body {
         alert('请填写消息内容。');
         return;
       }
-
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
       const data = {
-        text: message, // Assuming the backend expects 'text' field
+        message_text:message,
+        userID_send:userId,
+        groupID:groupId
       };
-
+      console.log(data);
       try {
-        const response = await fetch(`/api/groups/${groupId}/messages`, {
+        const response = await fetch(`/api/messages/send`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -284,25 +289,18 @@ body {
         });
 
         if (response.ok) {
-          const result = await response.json(); // Assuming the response returns the created message
-          // Optionally, you can append the new message without refetching all messages
-          /*
-          const messageElement = document.createElement('div');
-          messageElement.classList.add('message');
-          messageElement.innerHTML = `
-            <h3>${result.sender}</h3>
-            <p>${result.text}</p>
-          `;
-          chatListContainer.appendChild(messageElement);
-          */
+          console.log(response);
+          const result = await response.text(); 
           messageInput.value = ''; // Clear the input field
           getGroupMessages(); // Refresh the message list
         } else {
           const errorText = await response.text();
           alert(`发送失败: ${errorText}`);
         }
-      } catch (error) {
+      } 
+      catch (error) {
         console.error('Error:', error);
+        console.log(error);
         alert('Failed to send message. Please try again later.');
       }
     });
