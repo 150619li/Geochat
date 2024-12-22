@@ -21,8 +21,10 @@ router.post('/create', async (req, res) => {
        return res.status(400).send('Group name already exists');
      }
 
+    const groupid = new mongoose.Types.ObjectId()
+
     const newGroup = new Group({ 
-      groupID: new mongoose.Types.ObjectId(), 
+      groupID: groupid, 
       group_name, 
       lat, 
       lon, 
@@ -30,7 +32,7 @@ router.post('/create', async (req, res) => {
     });
 
     await newGroup.save();
-    res.status(201).send('Group created successfully');
+    res.status(201).send(newGroup._id);
   } catch (error) {
     res.status(400).send(error.message);
   }
