@@ -77,10 +77,8 @@
   <script>
     // Simulate the logged-in user's ID
     const token = localStorage.getItem('token'); // Get the JWT token from localStorage
-    
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
-    console.log(userId);
 
     // Handle adding a new follow
     document.getElementById('add-friend-btn').addEventListener('click', () => {

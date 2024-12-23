@@ -94,7 +94,6 @@
   <script>
     // Fetch the user's follow list
     const token = localStorage.getItem('token'); // Get the JWT token from localStorage
-    
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
 
@@ -107,9 +106,9 @@
       followList.forEach(follow => {
         const li = document.createElement('li');
         li.classList.add('follow-item');
-        li.textContent = follow.username;
+        li.textContent = [follow.careID._id ,follow.addtime];
         li.onclick = () => {
-          window.location.href = `privatechat.html?friendId=${follow._id}`;
+          window.location.href = `privatechat.html?friendId=${follow.careID}`;
         };
         followListElement.appendChild(li);
       });
