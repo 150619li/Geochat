@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Assess = require('../models/assess');  // 引入留言模型
 const Group = require('../models/Group');    // 假设你已经定义了 Group 模型
 
@@ -15,7 +16,9 @@ router.post('/send', async (req, res) => {
     }
 
     // 创建新留言
+    const noteid = new mongoose.Types.ObjectId()
     const newAssess = new Assess({
+      noteID: noteid,
       note_text,  // 留言内容
       senderID,   // 发送者的用户ID
       groupID,    // 留言所属的群聊ID
@@ -26,7 +29,7 @@ router.post('/send', async (req, res) => {
     await newAssess.save();
 
     res.status(201).json({
-      message: '留言成功',
+      message: '留言成功!',
       assess: newAssess
     });
   } catch (error) {
@@ -35,7 +38,7 @@ router.post('/send', async (req, res) => {
 });
 
 // 获取某个群聊的所有留言
-router.get('/group/:groupID', async (req, res) => {
+router.get('/:groupID', async (req, res) => {
   try {
     const { groupID } = req.params;
 

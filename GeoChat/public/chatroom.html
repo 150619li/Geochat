@@ -255,6 +255,9 @@ body {
     });
 
     document.getElementById('assess').addEventListener('click', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const groupId = urlParams.get('groupId');
+      localStorage.setItem('groupid',groupId); 
       window.location.href = 'assess.html'; // Redirect to group list page
     });
 
