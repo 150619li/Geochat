@@ -44,14 +44,15 @@
     </div>
   </div>
   <script>
+    
     function initializeMap(groups) {
       // 默认中心坐标（例如世界中心）
       let mapCenter = [0, 0];
       let mapZoom = 2;
 
       // 如果有组，使用第一个组的位置作为中心
-      if (groups.length > 0 && groups[0].latitude && groups[0].longitude) {
-        mapCenter = [groups[0].latitude, groups[0].longitude];
+      if (groups.length > 0 && groups[0].lat && groups[0].lon) {
+        mapCenter = [groups[0].lat, groups[0].lon];
         mapZoom = 5;
       }
 
@@ -64,9 +65,9 @@
 
       // 添加标记
       groups.forEach(group => {
-        if (group.latitude && group.longitude) {
+        if (group.lat && group.lon) {
           const marker = new AMap.Marker({
-            position: [group.longitude, group.latitude],
+            position: [group.lon, group.lat],
             title: group.name,
           });
 
@@ -86,33 +87,30 @@
 
       // 调整视图以适应所有标记
       const groupCoords = groups
-        .filter(group => group.latitude && group.longitude)
-        .map(group => [group.longitude, group.latitude]);
+        .filter(group => group.lat && group.lon)
+        .map(group => [group.lon, group.lat]);
 
       if (groupCoords.length > 0) {
         map.setFitView();
       }
     }
-    try {
-        // Fetch groups from backend using token for authentication
-        const response = await fetch(`/api/groups/all`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+    function getGroups() {
+      fetch('/api/groups/all', {
+                method: 'get',
+                headers: {
+                    'Content-Type': 'application/json'
+                }, 
+            })
+        .then(response => response.json())
+        .then(groups => {
+          console.log(groups);
+          initializeMap(groups);
+        })
+        .catch(error => {
+          console.error('Error:', error);
         });
-        if (response.ok) {
-          const groups = await response.json(); // Assuming the response is a list of groups
-            initializeMap(groups);
-        } else {
-            alert('附近没有群组信息');
-        }
-    } 
-    catch (error) {
-        console.error(error);
-        alert('附近没有群组信息');
     }
-    initializeMap(groups);
+    getGroups();
   </script>
 </body>
 </html>
