@@ -172,6 +172,7 @@ body {
       <button type="submit">发送</button>
     </form>
     <button id="change-groups">Change Groups</button>
+    <button id="assess">Assess</button>
   </div>
 
   <script>
@@ -251,6 +252,13 @@ body {
     document.getElementById('change-groups').addEventListener('click', () => {
       localStorage.removeItem('groupid'); 
       window.location.href = 'grouplist.html'; // Redirect to group list page
+    });
+
+    document.getElementById('assess').addEventListener('click', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const groupId = urlParams.get('groupId');
+      localStorage.setItem('groupid',groupId); 
+      window.location.href = 'assess.html'; // Redirect to group list page
     });
 
     // Fetch group messages when page loads

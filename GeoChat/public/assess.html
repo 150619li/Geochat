@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>评价列表</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+        .assessment {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .assessment-text {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .actions {
+            margin-top: 10px;
+        }
+        .action-button {
+            padding: 5px 10px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .likes-count {
+            font-weight: bold;
+        }
+        .replies-container {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>评价列表</h1>
+    
+    <button class="post-assessment-button" onclick="handlePostAssessment()">发布评价</button>
+
+    <!-- 评价列表容器 -->
+    <div id="assessment-list">
+        <!-- 动态生成评价项 -->
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    const decodedToken = jwt_decode(token);
+    const userId = decodedToken.userId;
+
+    const groupId = localStorage.getItem('groupid'); 
+
+    // 获取群聊所有评价
+    async function fetchAssessments() {
+        const response = await fetch(`/api/assess/${groupId}`,{
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        renderAssessments(data);
+    }
+
+    // 渲染评价列表
+    function renderAssessments(assessments) {
+        const assessmentListContainer = document.getElementById('assessment-list');
+        assessmentListContainer.innerHTML = ''; // 清空列表
+
+        assessments.forEach(assessment => {
+            const assessmentElement = document.createElement('div');
+            assessmentElement.classList.add('assessment');
+            const noteTextElement = document.createElement('div');
+            noteTextElement.classList.add('assessment-text');
+            noteTextElement.textContent = `${assessment.senderID.username}: ${assessment.note_text}`;
+
+            const actionsElement = document.createElement('div');
+            actionsElement.classList.add('actions');
+
+            // 点赞按钮
+            const likeButton = document.createElement('button');
+            likeButton.classList.add('action-button');
+            likeButton.textContent = `点赞 (${assessment.likes})`;
+            likeButton.onclick = () => handleLike(assessment._id);
+
+            // 回复按钮
+            const replyButton = document.createElement('button');
+            replyButton.classList.add('action-button');
+            replyButton.textContent = "回复";
+            replyButton.onclick = () => handleReply(assessment._id);
+
+            actionsElement.appendChild(likeButton);
+            actionsElement.appendChild(replyButton);
+
+            assessmentElement.appendChild(noteTextElement);
+            assessmentElement.appendChild(actionsElement);
+
+            //查看回复按钮
+            const viewRepliesButton = document.createElement('button');
+            viewRepliesButton.classList.add('action-button');
+            viewRepliesButton.textContent = "查看所有回复";
+            viewRepliesButton.onclick = () => loadReplies(assessment._id, assessmentElement);
+
+            // 添加查看回复按钮
+            assessmentElement.appendChild(viewRepliesButton);
+
+            // 回复部分（初始不加载）
+            const repliesContainer = document.createElement('div');
+            repliesContainer.classList.add('replies-container');
+            repliesContainer.style.display = 'none'; // 默认隐藏回复部分
+            assessmentElement.appendChild(repliesContainer);
+
+            assessmentListContainer.appendChild(assessmentElement);
+        });
+    }
+
+    // 点赞操作
+    async function handleLike(noteID) {
+        const response = await fetch(`/api/assess/${noteID}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(`点赞成功！ 当前点赞数：${data.likes}`);
+            fetchAssessments(); // 重新获取评价列表并渲染
+        } else {
+            alert('点赞失败');
+        }
+    }
+
+    // 回复操作
+    async function handleReply(noteID) {
+        const replyText = prompt("请输入您的回复：");
+        if (replyText) {
+            const response = await fetch('/api/assess/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    note_text: replyText,
+                    senderID: userId,
+                    groupID: groupId,
+                    backID: noteID
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert("回复成功！");
+                fetchAssessments(); // 重新获取评价列表并渲染
+            } else {
+                alert('回复失败');
+            }
+        }
+    }
+
+    // 获取某个留言的所有回复
+    async function loadReplies(noteID, assessmentElement) {
+        const repliesContainer = assessmentElement.querySelector('.replies-container');
+        
+        // 如果回复部分已经显示，则不再请求
+        if (repliesContainer.style.display === 'block') {
+            return;
+        }
+
+        const response = await fetch(`/api/assess/${noteID}/replies`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+
+        repliesContainer.innerHTML = '';  // 清空回复列表
+
+        if (data.length === 0) {
+            repliesContainer.innerHTML = '没有回复。';
+        } else {
+            data.forEach(reply => {
+                const replyElement = document.createElement('div');
+                replyElement.textContent = `${reply.senderID.username}: ${reply.note_text}`;
+                repliesContainer.appendChild(replyElement);
+            });
+        }
+
+        repliesContainer.style.display = 'block';  // 显示回复部分
+    }
+
+    // 发布新评价
+    async function handlePostAssessment() {
+        const assessmentText = prompt("请输入您的评价：");
+        if (assessmentText) {
+            const response = await fetch('/api/assess/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    note_text: assessmentText,
+                    senderID: userId,
+                    groupID: groupId,
+                    backID: null  // 作为新评价没有回复
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("评价发布成功！");
+                fetchAssessments(); // 重新获取评价列表并渲染
+            } else {
+                console.log("Error Data:", data);
+                alert('发布评价失败');
+            }
+        }
+    }
+
+    // 页面加载时获取评价列表
+    window.onload = fetchAssessments;
+</script>
+
+</body>
+</html>
