@@ -264,7 +264,8 @@ crossorigin=""
       groups.forEach(group => {
         if (group.latitude && group.longitude) {
           const marker = L.marker([group.latitude, group.longitude]).addTo(map);
-          marker.bindPopup(`<b>${group.name}</b><br>${group.description || 'No description available'}`).openPopup();
+
+          marker.bindPopup(`<b>${group.name}</b><br>${group._id}`).openPopup();
 
           // Add click event to redirect to chatroom.html with groupId
           marker.on('click', () => {
@@ -320,7 +321,7 @@ crossorigin=""
             groupElement.classList.add('group');
             groupElement.innerHTML = `
               <h3>${group.group_name}</h3>
-              <p>${group.description || 'No description available'}</p>
+              <p>${group._id}</p>
               <a href="chatroom.html?groupId=${group._id}">Go to Chat</a>
             `;
             groupListContainer.appendChild(groupElement);
