@@ -116,4 +116,26 @@ router.get('/:userId/groups', async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+// 获取用户地理位置
+router.get('/getLocation/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // 查找用户信息
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // 返回用户的地理位置
+    res.status(200).json({
+      lat: user.poi.lat,
+      lon: user.poi.lon
+    });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
 module.exports = router;

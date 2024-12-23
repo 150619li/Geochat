@@ -174,7 +174,7 @@
                 }
                 
                 alert('登陆成功，您的位置已更新！')
-                window.location.href = 'grouplist.html';  // 登录成功后跳转到聊天页面
+                window.location.href = 'mychat.html';  // 登录成功后跳转到聊天主页面
             } else {
                 const elsedata = await response.text();
                 alert(elsedata);  // 显示服务器返回的错误信息
