@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Friend</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #4CAF50;
+      margin-bottom: 30px;
+    }
+
+    /* Input and Button */
+    #friend-id-input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #add-friend-btn {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #add-friend-btn:hover {
+      background-color: #45a049;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #888;
+    }
+
+    /* Error Message */
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Add a Friend</h2>
+
+  <input type="text" id="friend-id-input" placeholder="Enter friend's user ID" />
+
+  <button id="add-friend-btn">Add Friend</button>
+
+  <div class="error" id="error-message"></div>
+
+  <script>
+    // Simulate the logged-in user's ID
+    const token = localStorage.getItem('token'); // Get the JWT token from localStorage
+    
+    const decodedToken = jwt_decode(token);
+    const userId = decodedToken.userId;
+    console.log(userId);
+
+    // Handle adding a new follow
+    document.getElementById('add-friend-btn').addEventListener('click', () => {
+      const friendId = document.getElementById('friend-id-input').value;
+      if (friendId) {
+        addFollow(friendId);
+      } else {
+        document.getElementById('error-message').textContent = 'Please enter a valid user ID.';
+      }
+    });
+
+    // Function to send the follow request to the backend
+    function addFollow(friendId) {
+      fetch('/api/users/follow', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: userId,
+          careId: friendId
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          window.location.href = 'carelist.html';  // Redirect back to follow list page
+        } else {
+          response.text().then(text => {
+            document.getElementById('error-message').textContent = text;
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Error adding friend:', err);
+        document.getElementById('error-message').textContent = 'Error adding friend.';
+      });
+    }
+  </script>
+</body>
+</html>

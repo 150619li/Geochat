@@ -138,4 +138,28 @@ router.get('/getLocation/:userId', async (req, res) => {
   }
 });
 
+router.get('/followList/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // 查找用户并使用 populate 填充 careID 的用户信息
+    const user = await User.findById(userId).populate('care.careID');
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // 获取用户关注的所有用户信息
+    const followList = user.care.map(care => ({
+      careID: care.careID,  // 获取完整的用户信息对象
+      addtime: care.addtime  // 获取关注时间
+    }));
+
+    res.status(200).json(followList);  // 返回关注列表
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+
+
 module.exports = router;

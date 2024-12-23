@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Follow List</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #4CAF50;
+      margin-bottom: 30px;
+    }
+
+    /* Add Follow Button */
+    #add-follow-btn {
+      display: block;
+      width: 200px;
+      margin: 0 auto 30px;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #add-follow-btn:hover {
+      background-color: #45a049;
+    }
+
+    /* Follow List Container */
+    #follow-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .follow-item {
+      background-color: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .follow-item:hover {
+      background-color: #f1f1f1;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #888;
+    }
+
+    /* Error Message */
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Follow List</h2>
+
+  <button id="add-follow-btn">Add Follow</button>
+
+  <ul id="follow-list">
+    <!-- Follow list will be dynamically added here -->
+  </ul>
+
+  <div class="error" id="error-message"></div>
+
+  <script>
+    // Fetch the user's follow list
+    const token = localStorage.getItem('token'); // Get the JWT token from localStorage
+    
+    const decodedToken = jwt_decode(token);
+    const userId = decodedToken.userId;
+
+    // Function to render the follow list
+    function renderFollowList(followList) {
+      const followListElement = document.getElementById('follow-list');
+      followListElement.innerHTML = '';  // Clear the current list
+
+      // Loop through the follow list and create a list item for each followed user
+      followList.forEach(follow => {
+        const li = document.createElement('li');
+        li.classList.add('follow-item');
+        li.textContent = follow.username;
+        li.onclick = () => {
+          window.location.href = `privatechat.html?friendId=${follow._id}`;
+        };
+        followListElement.appendChild(li);
+      });
+    }
+
+    // Simulate fetching follow list from backend
+    function fetchFollowList() {
+      fetch(`/api/users/followList/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && Array.isArray(data)) {
+            renderFollowList(data);
+          } else {
+            document.getElementById('error-message').textContent = 'Failed to load follow list.';
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching follow list:', err);
+          document.getElementById('error-message').textContent = 'Error loading follow list.';
+        });
+    }
+
+    // Simulate adding follow functionality
+    document.getElementById('add-follow-btn').addEventListener('click', () => {
+      window.location.href = 'addfriend.html';  // Redirect to add friend page
+    });
+
+    // Initialize the page by fetching the follow list
+    fetchFollowList();
+  </script>
+</body>
+</html>
