@@ -6,6 +6,7 @@
   <title>Map Groups</title>
   <!-- 引入高德地图的API -->
   <script src="https://webapi.amap.com/maps?v=1.4.15&key=9b0a7cf1d837970efd526099bf30b07e"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
   <style>
     /* 设置地图的高度为视口高度，充满整个页面 */
     body, html {
@@ -68,17 +69,36 @@
         if (group.lat && group.lon) {
           const marker = new AMap.Marker({
             position: [group.lon, group.lat],
-            title: group.name,
+            title: group.group_name,
           });
 
           marker.setMap(map);
 
           // 添加点击事件，跳转到chatroom.html
           marker.on('click', () => {
-            const userConfirmed = confirm(`Do you want to join the group: ${group.name}?`);
-
+            const userConfirmed = confirm(`Do you want to join the group: ${group.group_name}?`);
+            const token = localStorage.getItem('token');
+            const decodedToken = jwt_decode(token);
+            const userId = decodedToken.userId;
             if (userConfirmed) {
                 // 用户点击“确认”，跳转到群聊页面
+                const new_response =fetch(`/api/groups/${group._id}/addMember`, {
+                  method: 'POST',
+                  headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                      memberID: userId
+                      })
+                  });
+                  
+                  if (new_response.ok) {
+                    const new_data =new_response.text();
+                      alert(new_data)
+                  } else {
+                      
+                  }
+
                 window.location.href = `chatroom.html?groupId=${group._id}`;
             }
             });
