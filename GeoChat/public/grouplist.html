@@ -29,7 +29,7 @@
       min-height: 100vh; /* Ensure the body takes at least the full viewport height */
       display: flex;
       justify-content: center; /* Center horizontally */
-      align-items: center;     /* Center vertically */
+      align-items: flex-start;     /* Center vertically */
       background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
       font-family: Arial, sans-serif;
       padding: 20px; /* Add some padding for smaller screens */
@@ -42,10 +42,12 @@
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       width: 100%;
-      max-width: 1000px; /* Increased width to accommodate the map */
+      max-width: 1200px;
       display: flex;
       flex-direction: column;
       gap: 20px;
+      height: 95vh; /* Make the container taller */
+      overflow-y: auto;
     }
 
     /* Title styles */
@@ -53,14 +55,7 @@
       text-align: center;
       margin-bottom: 20px;
       color: #333333;
-    }
-
-    /* Group list and map container */
-    .content {
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
-    }
+    }    
 
     /* Group list styles */
     #group-list {
@@ -107,56 +102,110 @@
       color: #218838;
     }
 
-
-    /* Logout and Create Group buttons */
-    .buttons {
+    .buttons-container {
       display: flex;
-      flex-direction: row;
-      gap: 10px;
+      justify-content: center;
+      gap: 20px;
       margin-top: 20px;
     }
 
-    #create-group, #logout-btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 5px;
+    .buttons-container .top-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: absolute;
+      right: 30px; /* Position from the right */
+      top: 30px;
+    }
+
+    .buttons-container .top-buttons button {
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
       color: white;
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    #create-group {
-      background-color: #007bff;
-    }
-
-    #create-group:hover {
-      background-color: #0069d9;
+      transition: transform 0.1s, box-shadow 0.1s;
+      
     }
 
     #logout-btn {
-      background-color: #dc3545;
+      background-color: #df4242; 
     }
 
     #logout-btn:hover {
-      background-color: #c82333;
+      background-color: #df4242;
+    }
+
+    #locate {
+      background-color: hsl(142, 59%, 47%); /* Green */
+    }
+
+    #locate:hover {
+      background-color: hsl(142, 59%, 47%);
+    }
+
+    /* Search and Create buttons (side by side) */
+    .buttons-container .middle-buttons {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .buttons-container .middle-buttons button {
+      width: 48%; /* Half width for each button */
+      height: 60px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    /* Button colors */
+    #create-group {
+      background-color: hsl(209, 70%, 54%); /* Red */
+    }
+
+    #create-group:hover {
+      background-color: hsl(209, 70%, 54%);
+    }
+
+    #search-group {
+      background-color: hsl(209, 70%, 54%); /* Yellow */
+    }
+
+    #search-group:hover {
+      background-color: hsl(209, 70%, 54%);
     }
 
 
+    .buttons button:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
     @media (max-width: 650px) {
-      .container {
-        padding: 30px 20px;
+      .buttons-container {
+        flex-direction: column;
+        gap: 10px;
       }
 
-      .group {
-        padding: 15px;
+      .buttons-container .top-buttons {
+        width: 100%;
       }
 
-      #create-group, #logout-btn {
-        font-size: 14px;
-        padding: 10px;
+      .buttons-container .middle-buttons {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
       }
+
+      .buttons-container .middle-buttons button {
+        width: 100%;
+      }
+
+    
 
     }
   </style>
@@ -168,13 +217,18 @@
       <!-- The groups will be displayed here dynamically -->
       <p>Loading your groups...</p>
     </div>
+    <div class="buttons-container">
+      <div class="top-buttons">
+        <button id="logout-btn">Log Out</button>
+        <button id="locate">Refresh Location</button>
+      </div>
+      <div class="middle-buttons">
+        <button id="create-group">Create Group</button>
+        <button id="search-group">Search Group</button>
+      </div>
+    </div>
   </div>
-  <div class="buttons">
-    <button id="create-group">Create Group</button>
-    <button id="search-group">Search Group</button>
-    <button id="logout-btn">Log Out</button>
-    <button id="locate">Refresh Location</button>
-  </div>
+
 <!-- Leaflet JS -->
 <script
 src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -331,7 +385,6 @@ crossorigin=""
     }
 
 });
-
 
   
     // Fetch user groups when page loads

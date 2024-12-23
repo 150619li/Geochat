@@ -10,6 +10,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f0f8ff; /* 浅蓝色背景 */
         }
         .container {
             width: 80%;
@@ -25,12 +26,39 @@
             margin: 5px 0;
         }
         .actions {
+            display: flex;
+            gap: 10px; /* 按钮之间的间距 */
+            justify-content: flex-start; /* 按钮从左对齐 */
             margin-top: 10px;
+            flex-wrap: wrap; /* 如果屏幕较小，按钮会换行 */
         }
         .action-button {
-            padding: 5px 10px;
-            margin-right: 10px;
+            padding: 8px 16px;
+            font-size: 14px;
             cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+        .likes-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .likes-button:hover {
+            background-color: #218838;
+        }
+        .reply-button {
+            background-color: #ffc107;
+            color: white;
+        }
+        .reply-button:hover {
+            background-color: #e0a800;
+        }
+        .view-replies-button {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .view-replies-button:hover {
+            background-color: #138496;
         }
         .likes-count {
             font-weight: bold;
@@ -90,30 +118,29 @@
 
             // 点赞按钮
             const likeButton = document.createElement('button');
-            likeButton.classList.add('action-button');
+            likeButton.classList.add('action-button', 'likes-button');
             likeButton.textContent = `点赞 (${assessment.likes})`;
             likeButton.onclick = () => handleLike(assessment._id);
 
             // 回复按钮
             const replyButton = document.createElement('button');
-            replyButton.classList.add('action-button');
+            replyButton.classList.add('action-button', 'reply-button');
             replyButton.textContent = "回复";
             replyButton.onclick = () => handleReply(assessment._id);
 
-            actionsElement.appendChild(likeButton);
-            actionsElement.appendChild(replyButton);
-
-            assessmentElement.appendChild(noteTextElement);
-            assessmentElement.appendChild(actionsElement);
-
-            //查看回复按钮
+            // 查看所有回复按钮
             const viewRepliesButton = document.createElement('button');
-            viewRepliesButton.classList.add('action-button');
+            viewRepliesButton.classList.add('action-button', 'view-replies-button');
             viewRepliesButton.textContent = "查看所有回复";
             viewRepliesButton.onclick = () => loadReplies(assessment._id, assessmentElement);
 
-            // 添加查看回复按钮
-            assessmentElement.appendChild(viewRepliesButton);
+            // 将按钮添加到 actions 元素中
+            actionsElement.appendChild(likeButton);
+            actionsElement.appendChild(replyButton);
+            actionsElement.appendChild(viewRepliesButton);
+
+            assessmentElement.appendChild(noteTextElement);
+            assessmentElement.appendChild(actionsElement);
 
             // 回复部分（初始不加载）
             const repliesContainer = document.createElement('div');
@@ -237,3 +264,4 @@
 
 </body>
 </html>
+

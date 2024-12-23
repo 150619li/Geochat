@@ -5,26 +5,142 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Group</title>
+  <style>
+    /* Reset some default styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Set page height and background */
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f0f8ff, #c3e0e6); /* Light blue gradient */
+      font-family: Arial, sans-serif;
+    }
+
+    /* White box container */
+    .container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Title styles */
+    .container h2 {
+      text-align: center;
+      color: #333333;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* Form label and input styles */
+    label {
+      font-size: 16px;
+      color: #555555;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #f9f9f9;
+    }
+
+    input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    /* Submit button styles */
+    button[type="submit"] {
+      background-color: #007bff; /* Blue */
+      color: white;
+      font-weight: bold;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Logout button styles */
+    #logout-btn {
+      background-color: #dc3545; /* Red */
+      color: white;
+      font-weight: bold;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      width: 100%;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #logout-btn:hover {
+      background-color: #c82333;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Small screen adjustments */
+    @media (max-width: 650px) {
+      .container {
+        padding: 30px;
+      }
+
+      input, button {
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>Create a New Group</h2>
-  <form id="create-group-form">
-    <label for="group-name">Group Name:</label>
-    <input type="text" id="group-name" placeholder="Enter group name" required><br>
+  <div class="container">
+    <h2>Create a New Group</h2>
+    <form id="create-group-form">
+      <label for="group-name">Group Name:</label>
+      <input type="text" id="group-name" placeholder="Enter group name" required><br>
 
-    <label for="lat">Latitude:</label>
-    <input type="text" id="lat" placeholder="Enter latitude" required><br>
+      <label for="lat">Latitude:</label>
+      <input type="text" id="lat" placeholder="Enter latitude" required><br>
 
-    <label for="lon">Longitude:</label>
-    <input type="text" id="lon" placeholder="Enter longitude" required><br>
+      <label for="lon">Longitude:</label>
+      <input type="text" id="lon" placeholder="Enter longitude" required><br>
 
-    <label for="radius">Radius:</label>
-    <input type="text" id="radius" placeholder="Enter radius" required><br>
+      <label for="radius">Radius:</label>
+      <input type="text" id="radius" placeholder="Enter radius" required><br>
 
-    <button type="submit">Create Group</button>
-  </form>
+      <button type="submit">Create Group</button>
+    </form>
 
-  <button id="logout-btn">Logout</button>
+    <button id="logout-btn">Logout</button>
+  </div>
 
   <script>
     // Create group function
@@ -61,10 +177,10 @@
         }
 
         const decodedToken = jwt_decode(token);
-        const userId = decodedToken.userId; 
+        const userId = decodedToken.userId;
 
         const the_groupId = adata;
-        console.log(the_groupId)
+        console.log(the_groupId);
         const new_response = await fetch(`/api/groups/${the_groupId}/addMember`, {
         method: 'POST',
         headers: {
@@ -78,7 +194,7 @@
         const new_data = await new_response.text();
 
         if (new_response.ok) {
-            alert(new_data)
+            alert(new_data);
         } else {
             alert(new_data);
         }
@@ -97,3 +213,4 @@
   </script>
 </body>
 </html>
+
