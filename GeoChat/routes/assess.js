@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Assess = require('../models/assess');  // 引入留言模型
-const Group = require('../models/group');    // 假设你已经定义了 Group 模型
+const Group = require('../models/Group');    // 假设你已经定义了 Group 模型
 
 // 发送留言
 router.post('/send', async (req, res) => {
