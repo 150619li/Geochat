@@ -9,16 +9,10 @@
 <body>
   <h2>Create a New Group</h2>
   <form id="create-group-form">
-    <label for="group-name">Group Name:</label>
+    <label for="group-name">群聊名:</label>
     <input type="text" id="group-name" placeholder="Enter group name" required><br>
 
-    <label for="lat">Latitude:</label>
-    <input type="text" id="lat" placeholder="Enter latitude" required><br>
-
-    <label for="lon">Longitude:</label>
-    <input type="text" id="lon" placeholder="Enter longitude" required><br>
-
-    <label for="radius">Radius:</label>
+    <label for="radius">你希望的搜索半径/km:</label>
     <input type="text" id="radius" placeholder="Enter radius" required><br>
 
     <button type="submit">Create Group</button>
@@ -32,63 +26,101 @@
       e.preventDefault();
 
       const groupName = document.getElementById('group-name').value;
-      const lat = document.getElementById('lat').value;
-      const lon = document.getElementById('lon').value;
       const radius = document.getElementById('radius').value;
 
-      const response = await fetch('/api/groups/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          group_name: groupName,
-          lat: lat,
-          lon: lon,
-          radius: radius
-        })
-      });
+      const token = localStorage.getItem('token');
 
-      if (response.ok) {
-        // Assuming the group creation was successful
-        alert('Group created successfully!');
-        const adata = await response.json();
+      let lat, lon;  // 在函数外部声明变量
 
-        const token = localStorage.getItem('token');
         if (!token) {
             alert('You must be logged in to create a group.');
             return;
         }
 
-        const decodedToken = jwt_decode(token);
-        const userId = decodedToken.userId; 
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
 
-        const the_groupId = adata;
-        console.log(the_groupId)
-        const new_response = await fetch(`/api/groups/${the_groupId}/addMember`, {
-        method: 'POST',
-        headers: {
+      async function createGroupWithLocation(userId, radius) {
+          try {
+              const georesponse = await fetch(`/api/users/getLocation/${userId}`,{
+              method: 'GET',
+              headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-            memberID: userId
-            })
+              }
+              });
+
+              if (georesponse.ok) {
+                  const geodata = await georesponse.json();
+                  lat = geodata.lat;  // 给全局变量 lat 和 lon 赋值
+                  lon = geodata.lon;
+                  console.log(lat, lon);  // 打印出来检查
+              } else {
+                  console.error('Failed to fetch geolocation data');
+                  return;
+              }
+
+              // 创建群组
+              const response = await fetch('/api/groups/create', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                      group_name: groupName,
+                      lat: lat,  // 在这里使用 lat 和 lon
+                      lon: lon,
+                      radius: radius
+                  })
+              });
+
+              if (response.ok) {
+                // Assuming the group creation was successful
+                alert('Group created successfully!');
+                const adata = await response.json();
+
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('You must be logged in to create a group.');
+                    return;
+                }
+
+                const decodedToken = jwt_decode(token);
+                const userId = decodedToken.userId; 
+
+                const the_groupId = adata;
+                const new_response = await fetch(`/api/groups/${the_groupId}/addMember`, {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                    memberID: userId
+                    })
+                });
+
+                const new_data = await new_response.text();
+
+                if (new_response.ok) {
+                    alert(new_data)
+                } else {
+                    alert(new_data);
+                }
+
+                window.location.href = 'grouplist.html'; // Redirect to chatroom after creating the group
+              } else {
+                const data = await response.text();
+                alert(data);
+              }
+
+              } catch (error) {
+                  console.error('Error:', error);
+              }
+          }
+
+        createGroupWithLocation(userId, radius);
+
         });
 
-        const new_data = await new_response.text();
-
-        if (new_response.ok) {
-            alert(new_data)
-        } else {
-            alert(new_data);
-        }
-
-        window.location.href = 'grouplist.html'; // Redirect to chatroom after creating the group
-      } else {
-        const data = await response.text();
-        alert(data);
-      }
-    });
 
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('token'); // Remove the token
