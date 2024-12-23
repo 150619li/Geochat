@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const userRouter = require('./routes/user');
 const groupRouter = require('./routes/group');
 const messageRouter = require('./routes/message');
+const assessRouter = require('./routes/assess');
 const path = require('path');
 require('dotenv').config();
 
@@ -22,6 +23,7 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/users', userRouter);
 app.use('/api/groups', groupRouter);
 app.use('/api/messages', messageRouter);
+app.use('/api/assess', assessRouter);
 
 // 启动服务器
 app.listen(port, () => {
