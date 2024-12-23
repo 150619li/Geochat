@@ -5,7 +5,8 @@ const assessSchema = new mongoose.Schema({
   note_text: { type: String, required: true },
   senderID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   likes: { type: Number, default: 0 },
-  backID: { type: mongoose.Schema.Types.ObjectId, ref: 'Assess' }
+  backID: { type: mongoose.Schema.Types.ObjectId, ref: 'Assess' },
+  groupID: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
 });
 
 const Assess = mongoose.model('Assess', assessSchema);
