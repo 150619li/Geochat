@@ -42,13 +42,42 @@ router.post('/send', async (req, res) => {
   }
 });
 
-// 获取所有消息
-router.get('/all', async (req, res) => {
+//获取私聊信息
+router.get('/private/:userId/:friendId', async (req, res) => {
+  const { userId, friendId } = req.params;
+
   try {
-    const messages = await Message.find().populate('sender');
-    res.status(200).json(messages);
+    // 获取指定用户和朋友之间的消息
+    const messages = await Message.find({
+      $or: [
+        { userID_send: userId, userID_receive: friendId },
+        { userID_send: friendId, userID_receive: userId }
+      ]
+    }).sort({ message_time: 1 }); // 按时间升序排列
+
+    res.json(messages); // 返回消息列表
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(500).send(error.message);
+  }
+});
+
+// 发送私聊消息
+router.post('/private/sendPrivate', async (req, res) => {
+  const { message_text, sender_id, receiver_id } = req.body;
+
+  try {
+    const newMessage = new Message({
+      messageID: new mongoose.Types.ObjectId(),
+      message_text,
+      userID_send: sender_id,
+      userID_receive: receiver_id,
+      message_time: new Date()
+    });
+
+    await newMessage.save();
+    res.status(201).send('Message sent');
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 });
 

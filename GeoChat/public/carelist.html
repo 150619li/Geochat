@@ -108,7 +108,7 @@
         li.classList.add('follow-item');
         li.textContent = [follow.careID._id ,follow.addtime];
         li.onclick = () => {
-          window.location.href = `privatechat.html?friendId=${follow.careID}`;
+          window.location.href = `privatechat.html?userId=${userId}&friendId=${follow.careID._id}`;
         };
         followListElement.appendChild(li);
       });
