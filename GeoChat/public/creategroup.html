@@ -121,22 +121,6 @@
   </style>
 </head>
 <body>
-<<<<<<< HEAD
-  <div class="container">
-    <h2>Create a New Group</h2>
-    <form id="create-group-form">
-      <label for="group-name">Group Name:</label>
-      <input type="text" id="group-name" placeholder="Enter group name" required><br>
-
-      <label for="lat">Latitude:</label>
-      <input type="text" id="lat" placeholder="Enter latitude" required><br>
-
-      <label for="lon">Longitude:</label>
-      <input type="text" id="lon" placeholder="Enter longitude" required><br>
-
-      <label for="radius">Radius:</label>
-      <input type="text" id="radius" placeholder="Enter radius" required><br>
-=======
   <h2>Create a New Group</h2>
   <form id="create-group-form">
     <label for="group-name">群聊名:</label>
@@ -144,7 +128,6 @@
 
     <label for="radius">你希望的搜索半径/km:</label>
     <input type="text" id="radius" placeholder="Enter radius" required><br>
->>>>>>> 2b31d0c80c8c086d67795bd79f1ef6190c2af558
 
       <button type="submit">Create Group</button>
     </form>
@@ -169,16 +152,6 @@
             return;
         }
 
-<<<<<<< HEAD
-        const decodedToken = jwt_decode(token);
-        const userId = decodedToken.userId;
-
-        const the_groupId = adata;
-        console.log(the_groupId);
-        const new_response = await fetch(`/api/groups/${the_groupId}/addMember`, {
-        method: 'POST',
-        headers: {
-=======
       const decodedToken = jwt_decode(token);
       const userId = decodedToken.userId;
 
@@ -187,7 +160,6 @@
               const georesponse = await fetch(`/api/users/getLocation/${userId}`,{
               method: 'GET',
               headers: {
->>>>>>> 2b31d0c80c8c086d67795bd79f1ef6190c2af558
                 'Content-Type': 'application/json'
               }
               });
@@ -264,23 +236,6 @@
 
         });
 
-<<<<<<< HEAD
-        const new_data = await new_response.text();
-
-        if (new_response.ok) {
-            alert(new_data);
-        } else {
-            alert(new_data);
-        }
-
-        window.location.href = 'grouplist.html'; // Redirect to chatroom after creating the group
-      } else {
-        const data = await response.text();
-        alert(data);
-      }
-    });
-=======
->>>>>>> 2b31d0c80c8c086d67795bd79f1ef6190c2af558
 
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('token'); // Remove the token
