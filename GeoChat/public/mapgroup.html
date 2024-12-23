@@ -50,7 +50,8 @@
       // 默认中心坐标（例如世界中心）
       let mapCenter = [0, 0];
       let mapZoom = 2;
-
+      let lat;
+      let lon;
       // 如果有组，使用第一个组的位置作为中心
       if (groups.length > 0 && groups[0].lat && groups[0].lon) {
         mapCenter = [groups[0].lat, groups[0].lon];
@@ -63,10 +64,38 @@
         zoom: mapZoom,
         mapStyle: 'amap://styles/normal',  // 设置地图样式
       });
+      const token = localStorage.getItem('token');
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
+      const georesponse = fetch(`/api/users/getLocation/${userId}`,{
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+              });
 
+              if (georesponse.ok) {
+                  const geodata = georesponse.json();
+                  lat = geodata.lat;  // 给全局变量 lat 和 lon 赋值
+                  lon = geodata.lon;
+                  console.log(lat, lon);  // 打印出来检查
+              } else {
+                  console.error('Failed to fetch geolocation data');
+                  return;
+              }
       // 添加标记
+      function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // 地球半径（单位：千米）
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // 返回的单位是千米
+      }
       groups.forEach(group => {
-        if (group.lat && group.lon) {
+        if (group.lat && group.lon && getDistance(lat, lon, group.lat, group.lon)<group.radius) {
           const marker = new AMap.Marker({
             position: [group.lon, group.lat],
             title: group.group_name,
