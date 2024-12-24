@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Friend</title>
+  <script src="https://webapi.amap.com/maps?v=1.4.15&key=9b0a7cf1d837970efd526099bf30b07e"></script>
   <style>
     /* Basic Reset */
     * {
@@ -63,6 +64,10 @@
       text-align: center;
       margin-top: 20px;
     }
+    #map {
+      width: 100%;
+      height: 70vh; /* 设置地图充满整个页面 */
+    }
   </style>
 </head>
 <body>
@@ -71,8 +76,10 @@
   <input type="text" id="friend-id-input" placeholder="Enter friend's user ID" />
 
   <button id="add-friend-btn">Add Friend</button>
-
-  <div class="error" id="error-message"></div>
+  <p>GeoChat &copy; 2024</p>
+  <div id="map">
+    <!-- 高德地图将会在这里渲染 -->
+  </div>
 
   <script>
     // Simulate the logged-in user's ID
@@ -86,7 +93,7 @@
       if (friendId) {
         addFollow(friendId);
       } else {
-        document.getElementById('error-message').textContent = 'Please enter a valid user ID.';
+        alert('Please enter a valid user ID.');
       }
     });
 
@@ -107,15 +114,83 @@
           window.location.href = 'carelist.html';  // Redirect back to follow list page
         } else {
           response.text().then(text => {
-            document.getElementById('error-message').textContent = text;
+           alert(text);
           });
         }
       })
       .catch(err => {
         console.error('Error adding friend:', err);
-        document.getElementById('error-message').textContent = 'Error adding friend.';
+        alert('Error adding friend.');
       });
     }
+    function initializeMap(users){
+      // 创建地图实例
+      const map = new AMap.Map('map', {
+        zoom: 4,
+        center: [116.397428, 39.90923]
+      });
+      console.log(users);
+      users.forEach(user => {
+        if (user.poi.lat && user.poi.lon) {
+          const marker = new AMap.Marker({
+            position: [user.poi.lon, user.poi.lat],
+            title: user.username
+          });
+
+          // 将创建的点标记添加到已有的地图实例：
+          map.add(marker);
+          marker.on('click', () => {
+                    const userConfirmed = confirm(`Do you want to add friend: ${user.username}?`);
+                    if (userConfirmed) {
+                        // 用户点击“确认”，跳转到添加好友
+                        const token = localStorage.getItem('token');
+                        const decodedToken = jwt_decode(token);
+                        const userId = decodedToken.userId;
+
+                        fetch(`/api/users/follow`, {
+                          method: 'POST',
+                          headers: {
+                                  'Content-Type': 'application/json'
+                              },
+                              body: JSON.stringify({
+                              userId: userId,
+                              careId: user._id
+                              })
+                          }).then(new_response => {
+                          
+                          if (new_response.ok) {
+                            const new_data =new_response.text();
+                              alert(new_data)
+                              window.location.href = 'carelist.html';  // Redirect back to follow list page
+                          } else {
+                              alert('Error adding friend.');
+                          }
+                    });
+                    }
+                  });
+        }
+      });
+
+      // 调整视图以适应所有标记
+      const userCoords = users
+        .filter(user => user.poi.lat && user.poi.lon)
+        .map(user => [user.poi.lon, user.poi.lat]);
+
+      if (userCoords.length > 0) {
+        map.setFitView();
+      }
+    }
+    function getusers(){
+      fetch('/api/users/all')
+      .then(response => response.json())
+      .then(data => {
+        initializeMap(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+    getusers();
   </script>
 </body>
 </html>
