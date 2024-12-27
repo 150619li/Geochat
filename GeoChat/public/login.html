@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,34 +16,54 @@
 
         /* 设置页面高度和背景 */
         body {
-            height: 100vh; /* 视口高度 */
+            height: 100vh;
+            /* 视口高度 */
             display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center;     /* 垂直居中 */
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            justify-content: center;
+            /* 水平居中 */
+            align-items: center;
+            /* 垂直居中 */
+            background-image: url("C:\\白小丹在北大\\大三上\\软件工程原理\\大作业\\img\\img\\3.JPG");
+            /* 设置页面整体背景图片，这里的路径根据实际情况调整 */
+            background-size: cover;
+            /* 让图片覆盖整个页面背景区域 */
+            background-repeat: no-repeat;
+            /* 不重复图片 */
+            background-position: center;
+            /* 图片居中显示 */
             font-family: Arial, sans-serif;
+            position: relative;
+            /* 为了让.container 能基于它定位 */
+            -webkit-backdrop-filter: brightness(100%) contrast(100%) saturate(100%) blur(0px) opacity(0.5);
+            backdrop-filter: brightness(100%) contrast(100%) saturate(100%) blur(0px) opacity(0.5);
+            /* 上面两行代码用于调整背景图片的透明度为50%，其他滤镜属性保持默认，可根据需求进一步调整 */
         }
 
         /* 容器样式 */
-        .container {
+     .container {
             background-color: #ffffff;
             padding: 40px 30px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
+            position: relative;
+            /* 开启相对定位 */
+            z-index: 1;
+            /* 提高层级，使其显示在背景图片之上 */
         }
 
         /* 标题样式 */
-        .container h2 {
+     .container h2 {
             text-align: center;
             margin-bottom: 20px;
             color: #333333;
-            font-size: 28px;/*new*/
+            font-size: 28px;
+            /* new */
         }
 
         /* 表单元素样式 */
-        .container form input {
+     .container form input {
             width: 100%;
             padding: 12px 15px;
             margin: 8px 0;
@@ -53,13 +74,13 @@
         }
 
         /* 输入框聚焦时的样式 */
-        .container form input:focus {
+     .container form input:focus {
             border-color: #66afe9;
             outline: none;
         }
 
         /* 提交按钮样式 */
-        .container form button {
+     .container form button {
             width: 100%;
             padding: 12px;
             margin-top: 15px;
@@ -73,39 +94,40 @@
         }
 
         /* 提交按钮悬停时的样式 */
-        .container form button:hover {
+     .container form button:hover {
             background-color: #0056b3;
         }
 
         /* 注册链接样式 */
-        .container p {
+     .container p {
             text-align: center;
             margin-top: 20px;
             color: #555555;
         }
 
-        .container p a {
+     .container p a {
             color: #007bff;
             text-decoration: none;
             transition: color 0.3s;
         }
 
-        .container p a:hover {
+     .container p a:hover {
             color: #0056b3;
         }
 
         /* 响应式设计 */
         @media (max-width: 500px) {
-            .container {
+         .container {
                 padding: 30px 20px;
             }
 
-            .container form button {
+         .container form button {
                 font-size: 16px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h2>登录</h2>
@@ -120,71 +142,71 @@
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
+
             try {
-            const response = await fetch('/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password }) 
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('token', data.token);  // 将token存储到localStorage
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
 
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(async(position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
 
-                        const token = localStorage.getItem('token');
-                        const decodedToken = jwt_decode(token);
-                        const userId = decodedToken.userId;
-                        
-                        try {
-                        const loc_response = await fetch('/api/users/updateLocation', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ userId, lat, lon }) 
-                    });
-                    
-                        const result = await loc_response.text();  
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(async (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
 
-                        if (loc_response.ok) {
-                        } else {
-                            alert(result); 
-                        }
-                        } catch (error) {
-                            alert('更新定位请求失败，请稍后再试');
-                        }
+                            const token = localStorage.getItem('token');
+                            const decodedToken = jwt_decode(token);
+                            const userId = decodedToken.userId;
 
-                    }, (error) => {
-                        console.error('Error getting location:', error);
-                        alert('无法获取您的位置');
-                    });
+                            try {
+                                const loc_response = await fetch('/api/users/updateLocation', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ userId, lat, lon })
+                                });
+
+                                const result = await loc_response.text();
+
+                                if (loc_response.ok) {
+                                } else {
+                                    alert(result);
+                                }
+                            } catch (error) {
+                                alert('更新定位请求失败，请稍后再试');
+                            }
+
+                        }, (error) => {
+                            console.error('Error getting location:', error);
+                            alert('无法获取您的位置');
+                        });
+                    } else {
+                        alert('您的浏览器不支持获取位置信息');
+                    }
+
+                    alert('登陆成功，您的位置已更新！')
+                    window.location.href = 'mychat.html';
                 } else {
-                    alert('您的浏览器不支持获取位置信息');
+                    const elsedata = await response.text();
+                    alert(elsedata);
                 }
-                
-                alert('登陆成功，您的位置已更新！')
-                window.location.href = 'mychat.html';  // 登录成功后跳转到聊天主页面
-            } else {
-                const elsedata = await response.text();
-                alert(elsedata);  // 显示服务器返回的错误信息
+            } catch (error) => {
+                console.error('Error:', error);
+                alert('发生了错误，请稍后再试');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('发生了错误，请稍后再试');
-        }
         });
     </script>
 </body>
-</html>
 
+</html>
