@@ -15,15 +15,25 @@
     }
 
     body {
+      height: 100vh;
       font-family: Arial, sans-serif;
       background-color: #f4f4f9;
       padding: 20px;
+      background-image: url('bg.JPG');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      position: relative;
+      -webkit-backdrop-filter: brightness(100%) contrast(100%) saturate(100%) blur(0px) opacity(0.5);
+      backdrop-filter: brightness(100%) contrast(100%) saturate(100%) blur(0px) opacity(0.5);
     }
 
     h2 {
       text-align: center;
-      color: #4CAF50;
+      color: #fefefe;
       margin-bottom: 30px;
+      font-weight: bold;
     }
 
     /* Input and Button */
@@ -48,7 +58,9 @@
     }
 
     #add-friend-btn:hover {
-      background-color: #45a049;
+      background-color: #2f6d32;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transform: translateY(1px);
     }
 
     /* Footer */
@@ -67,6 +79,7 @@
     #map {
       width: 100%;
       height: 70vh; /* 设置地图充满整个页面 */
+      border: 10px solid #0f5d14;
     }
   </style>
 </head>

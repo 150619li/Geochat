@@ -23,7 +23,8 @@
             /* 水平居中 */
             align-items: center;
             /* 垂直居中 */
-            background-image: url('../img/3.JPG');
+            background-image: url('bg.JPG');
+            
             /* 设置页面整体背景图片，这里的路径根据实际情况调整 */
             background-size: cover;
             /* 让图片覆盖整个页面背景区域 */
@@ -201,7 +202,7 @@
                     const elsedata = await response.text();
                     alert(elsedata);
                 }
-            } catch (error) => {
+            } catch (error) {
                 console.error('Error:', error);
                 alert('发生了错误，请稍后再试');
             }
