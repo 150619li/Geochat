@@ -116,12 +116,12 @@
       /*background-color: rgb(95, 210, 139);*//* 按钮后小块背景颜色 */
     }
 
-    .buttons-container .top-buttons {
+    /*.buttons-container .top-buttons {
       display: flex;
       flex-direction: column;
       gap: 10px;
       position: absolute;
-      right: 30px; /* Position from the right */
+      right: 30px; 
       top: 30px;
     }
 
@@ -134,51 +134,9 @@
       cursor: pointer;
       transition: transform 0.1s, box-shadow 0.1s;
       
-    }
+    }*/
 
-    #logout-btn {
-      background-color: transparent; 
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3), 0 -5px 10px rgba(0, 0, 0, 0.3); /* 通过上下不同方向的阴影营造立体圆柱效果 */
-      transition: all 0.3s;
-      border-style: none; 
-      color: rgb(144, 255, 162);
-      font-size: 15px;
-      font-weight: bold;
-      border-radius: 20px; /* 设置较大的圆角，模拟圆柱两端形状 */
-      padding: 8px 16px; /* 调整内边距，影响按钮大小和文字位置，可按需改 */
-      position: relative; /* 为实现点击凹陷效果提供定位基础 */
-    }
-
-    #logout-btn:hover {
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 -8px 15px rgba(0, 0, 0, 0.4); /* 鼠标悬停时增强立体效果 */
-    }
-
-    #logout-btn:active {
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 -2px 5px rgba(0, 0, 0, 0.2); /* 点击时（active状态）减弱阴影，模拟凹陷效果 */
-      transform: translateY(3px); /* 按钮在垂直方向向下移动一点，强化凹陷视觉效果 */
-    }
-
-    #locate {
-      background-color: transparent; 
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3), 0 -5px 10px rgba(0, 0, 0, 0.3); /* 通过上下不同方向的阴影营造立体圆柱效果 */
-      transition: all 0.3s;
-      border-style: none; 
-      color: rgb(144, 255, 162);
-      font-size: 11px;
-      font-weight: bold;
-      border-radius: 20px; /* 设置较大的圆角，模拟圆柱两端形状 */
-      padding: 8px 16px; /* 调整内边距，影响按钮大小和文字位置，可按需改 */
-      position: relative; /* 为实现点击凹陷效果提供定位基础 */
-    }
-
-    #locate:hover {
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 -8px 15px rgba(0, 0, 0, 0.4); /* 鼠标悬停时增强立体效果 */
-    }
-
-    #locate:active {
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 -2px 5px rgba(0, 0, 0, 0.2); /* 点击时（active状态）减弱阴影，模拟凹陷效果 */
-      transform: translateY(3px); /* 按钮在垂直方向向下移动一点，强化凹陷视觉效果 */
-    }
+    
 
     /* Search and Create buttons (side by side) */
     .buttons-container .middle-buttons {
@@ -242,13 +200,54 @@
       font-size: 18px;
       font-family: Verdana, sans-serif;
       font-weight: bold;
-      background-image: url('btn2.png'); /* 替换为你实际的图片路径 */
-      background-size: cover; /* 让图片覆盖整个按钮区域，可能会拉伸或裁剪图片 */
-      background-position: center; /* 图片居中显示 */
-      background-repeat: no-repeat; /* 不重复图片 */
+      background-image: url('btn2.png'); 
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat; 
     }
 
     #search-group:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transform: translateY(1px);
+    }
+    #logout-btn {
+      background-color: hsl(209, 70%, 54%); /* Red */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s;
+      border: 0;
+      color: white;
+      font-size: 18px;
+      font-family: Verdana, sans-serif;
+      font-weight: bold;
+      background-image: url('btn2.png'); 
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat;
+    }
+
+    #logout-btn:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transform: translateY(1px); 
+    }
+
+    
+
+    #locate {
+      background-color: hsl(209, 70%, 54%); /* Red */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s;
+      border: 0;
+      color: white;
+      font-size: 18px;
+      font-family: Verdana, sans-serif;
+      font-weight: bold;
+      background-image: url('btn1.png'); 
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat;
+    }
+
+    #locate:hover {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
       transform: translateY(1px);
     }
@@ -293,12 +292,14 @@
     </div>
     <div class="buttons-container">
       <div class="top-buttons">
-        <button id="logout-btn">Log Out</button>
-        <button id="locate">Refresh Location</button>
+        
       </div>
       <div class="middle-buttons">
         <button id="create-group">Create Group</button>
         <button id="search-group">Search Group</button>
+        <button id="locate">Refresh Location</button>
+        <button id="logout-btn">Log Out</button>
+        
       </div>
     </div>
   </div>
