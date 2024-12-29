@@ -270,6 +270,7 @@ body {
             messageElement.classList.add('message');
             messageElement.innerHTML = `
               <h3>${message.message_text}</h3>
+              <p>${message.message_time}</p>
               <p>${message.userID_send}</p>
             `;
             chatListContainer.appendChild(messageElement);

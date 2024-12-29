@@ -227,6 +227,7 @@
             }
             messageElement.innerHTML = `
               <h4>${message.userID_send}</h4>
+              <p>${message.message_time}</p>
               <p>${message.message_text}</p>
             `;
             chatListContainer.appendChild(messageElement);
@@ -275,6 +276,8 @@
           messageInput.value = ''; // Clear input
           getPrivateMessages(); // Refresh messages
         } else {
+          const ans = await response.text();
+          console.log(ans);
           alert('Failed to send message.');
         }
       } catch (error) {

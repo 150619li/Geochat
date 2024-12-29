@@ -138,6 +138,10 @@
         
         // Display username and the time they were followed
         li.textContent = `${follow.careID.username} (Followed on: ${new Date(follow.addtime).toLocaleDateString()})`;
+
+        li.onclick = () => {
+          window.location.href = `privatechat.html?userId=${userId}&friendId=${follow.careID._id}`
+        };
         
         // Create an unfollow button
         const unfollowButton = document.createElement('button');
@@ -200,9 +204,6 @@
       });
     }
 
-    // Initialize the page by fetching the follow list
-    fetchFollowList();
-
     document.getElementById('locate').addEventListener('click', () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async(position) => {
@@ -241,6 +242,14 @@
         alert('您的浏览器不支持获取位置信息');
     }
     });
+
+    // Simulate adding follow functionality
+    document.getElementById('add-follow-btn').addEventListener('click', () => {
+      window.location.href = 'addfriend.html';  // Redirect to add friend page
+    });
+
+    // Initialize the page by fetching the follow list
+    fetchFollowList();
 
   </script>
 </body>

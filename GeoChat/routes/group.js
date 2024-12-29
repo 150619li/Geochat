@@ -53,23 +53,38 @@ router.post('/:groupId/addMember', async (req, res) => {
   try {
     const { groupId } = req.params;
     const { memberID } = req.body;
+
+    // 查找群聊
     const group = await Group.findById(groupId);
     if (!group) {
       return res.status(404).send('Group not found');
     }
+
+    // 查找用户
     const user = await User.findById(memberID);
     if (!user) {
       return res.status(404).send('User not found');
     }
+
+    // 判断用户是否已经是群聊成员
+    if (group.memberID.includes(memberID)) {
+      return res.status(400).send('User is already a member of the group');
+    }
+
+    // 将用户添加到群聊成员列表中
     group.memberID.push(memberID);
     await group.save();
+
+    // 将群聊ID添加到用户的群聊列表中
     user.user_in_groups.push(groupId);
     await user.save();
+
     res.status(200).send('Member added successfully');
   } catch (error) {
     res.status(400).send(error.message);
   }
 });
+
 
 // 剔除群成员
 router.post('/:groupId/removeMember', async (req, res) => {

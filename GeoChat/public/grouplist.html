@@ -398,9 +398,11 @@ crossorigin=""
               <h3>${group.group_name}</h3>
               <p>${group._id}</p>
               <a href="chatroom.html?groupId=${group._id}">Go to Chat</a>
+              <button class="leave-group" data-group-id="${group._id}">Leave Group</button> <!-- 退出群聊按钮 -->
             `;
             groupListContainer.appendChild(groupElement);
           });
+
         } else {
           groupListContainer.innerHTML = '<p>Failed to load your groups. Please try again later.</p>';
         }
@@ -409,6 +411,39 @@ crossorigin=""
         groupListContainer.innerHTML = '<p>There was an error loading your groups.</p>';
       }
     }
+
+    // 监听退出群聊按钮的点击事件
+    document.getElementById('group-list').addEventListener('click', async (event) => {
+      if (event.target && event.target.classList.contains('leave-group')) {
+        const groupId = event.target.getAttribute('data-group-id');
+        const token = localStorage.getItem('token');
+        const decodedToken = jwt_decode(token);
+        const userId = decodedToken.userId;
+
+        try {
+          const response = await fetch(`/api/groups/${groupId}/removeMember`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ memberID: userId })
+          });
+
+          if (response.ok) {
+            alert('You have successfully left the group.');
+            window.location.reload();  // 刷新页面，更新群组列表
+          } else {
+            const result = await response.text();
+            alert(result);
+          }
+        } catch (error) {
+          console.error('Error leaving the group:', error);
+          alert('There was an error leaving the group. Please try again later.');
+        }
+      }
+    });
+
 
     document.getElementById('create-group').addEventListener('click', () => {
       window.location.href = 'creategroup.html';
