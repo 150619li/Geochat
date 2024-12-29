@@ -104,11 +104,39 @@
     document.getElementById('add-friend-btn').addEventListener('click', () => {
       const friendId = document.getElementById('friend-id-input').value;
       if (friendId) {
-        addFollow(friendId);
+        // Check if trying to follow self
+        if (friendId === userId) {
+          alert('不支持关注自己');
+          return;
+        }
+
+        // Check if already following this user
+        checkIfAlreadyFollowing(friendId);
       } else {
         alert('Please enter a valid user ID.');
       }
     });
+
+    // Function to check if the user is already following the friend
+    function checkIfAlreadyFollowing(friendId) {
+      fetch(`/api/users/followList/${userId}`)
+        .then(response => response.json())
+        .then(followingList => {
+          // 检查是否已经关注该用户
+          const alreadyFollowing = followingList.some(follow => follow.careID._id === friendId);
+          
+          if (alreadyFollowing) {
+            alert('您已关注该用户');
+          } else {
+            addFollow(friendId);
+          }
+        })
+        .catch(err => {
+          console.error('Error checking following list:', err);
+          alert('Error checking following list.');
+        });
+    }
+
 
     // Function to send the follow request to the backend
     function addFollow(friendId) {
@@ -136,7 +164,8 @@
         alert('Error adding friend.');
       });
     }
-    function initializeMap(users){
+
+    function initializeMap(users) {
       // 创建地图实例
       const map = new AMap.Map('map', {
         zoom: 4,
@@ -160,27 +189,18 @@
                         const decodedToken = jwt_decode(token);
                         const userId = decodedToken.userId;
 
-                        fetch(`/api/users/follow`, {
-                          method: 'POST',
-                          headers: {
-                                  'Content-Type': 'application/json'
-                              },
-                              body: JSON.stringify({
-                              userId: userId,
-                              careId: user._id
-                              })
-                          }).then(new_response => {
-                          
-                          if (new_response.ok) {
-                            const new_data =new_response.text();
-                              alert(new_data)
-                              window.location.href = 'carelist.html';  // Redirect back to follow list page
+                        if (user._id) {
+                            // Check if trying to follow self
+                            if (user._id === userId) {
+                              alert('不支持关注自己');
+                              return;
+                            }
+                            // Check if already following this user
+                            checkIfAlreadyFollowing(user._id);
                           } else {
-                              alert('Error adding friend.');
+                            alert('Please enter a valid user ID.');
                           }
-                    });
-                    }
-                  });
+                  }});
         }
       });
 
@@ -193,15 +213,16 @@
         map.setFitView();
       }
     }
-    function getusers(){
+
+    function getusers() {
       fetch('/api/users/all')
-      .then(response => response.json())
-      .then(data => {
-        initializeMap(data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+        .then(response => response.json())
+        .then(data => {
+          initializeMap(data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
     }
     getusers();
   </script>

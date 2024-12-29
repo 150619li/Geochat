@@ -78,6 +78,21 @@
       background-color: #f1f1f1;
     }
 
+    .unfollow-btn {
+      padding: 8px 12px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .unfollow-btn:hover {
+      background-color: #d32f2f;
+    }
+
     /* Footer */
     .footer {
       text-align: center;
@@ -97,6 +112,7 @@
   <h2>Follow List</h2>
 
   <button id="add-follow-btn">Add Follow</button>
+  <button id="locate">Refresh Location</button>
 
   <ul id="follow-list">
     <!-- Follow list will be dynamically added here -->
@@ -110,7 +126,7 @@
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
 
-    // Function to render the follow list
+    // Function to render the follow list with unfollow buttons
     function renderFollowList(followList) {
       const followListElement = document.getElementById('follow-list');
       followListElement.innerHTML = '';  // Clear the current list
@@ -119,10 +135,24 @@
       followList.forEach(follow => {
         const li = document.createElement('li');
         li.classList.add('follow-item');
-        li.textContent = [follow.careID._id ,follow.addtime];
-        li.onclick = () => {
-          window.location.href = `privatechat.html?userId=${userId}&friendId=${follow.careID._id}`;
+        
+        // Display username and the time they were followed
+        li.textContent = `${follow.careID.username} (Followed on: ${new Date(follow.addtime).toLocaleDateString()})`;
+        
+        // Create an unfollow button
+        const unfollowButton = document.createElement('button');
+        unfollowButton.classList.add('unfollow-btn');
+        unfollowButton.textContent = 'Unfollow';
+        
+        // Unfollow functionality
+        unfollowButton.onclick = () => {
+          unfollowUser(follow.careID._id);
         };
+
+        // Append the unfollow button to the list item
+        li.appendChild(unfollowButton);
+
+        // Append the list item to the follow list
         followListElement.appendChild(li);
       });
     }
@@ -144,13 +174,74 @@
         });
     }
 
-    // Simulate adding follow functionality
-    document.getElementById('add-follow-btn').addEventListener('click', () => {
-      window.location.href = 'addfriend.html';  // Redirect to add friend page
-    });
+    // Function to unfollow a user
+    function unfollowUser(friendId) {
+      fetch('/api/users/unfollow', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          careId: friendId,
+        }),
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('User unfollowed successfully');
+          fetchFollowList(); // Refresh the follow list after unfollowing
+        } else {
+          response.text().then(text => alert(text));
+        }
+      })
+      .catch(error => {
+        console.error('Error unfollowing user:', error);
+        alert('Error unfollowing user');
+      });
+    }
 
     // Initialize the page by fetching the follow list
     fetchFollowList();
+
+    document.getElementById('locate').addEventListener('click', () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async(position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            const token = localStorage.getItem('token');
+            const decodedToken = jwt_decode(token);
+            const userId = decodedToken.userId;
+
+            try {
+                const loc_response = await fetch('/api/users/updateLocation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId, lat, lon }) 
+            });
+            
+            const result = await loc_response.text();  
+
+            if (loc_response.ok) {
+                alert(result);  
+            } else {
+                alert(result); 
+            }
+            } catch (error) {
+            alert('更新定位请求失败，请稍后再试');
+            }
+
+        }, (error) => {
+            console.error('Error getting location:', error);
+            alert('无法获取您的位置');
+        });
+    } else {
+        alert('您的浏览器不支持获取位置信息');
+    }
+    });
+
   </script>
 </body>
 </html>

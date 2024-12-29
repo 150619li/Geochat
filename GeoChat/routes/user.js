@@ -169,5 +169,35 @@ router.get('/all', async (req, res) => {
   }
 });
 
+//取消关注
+router.post('/unfollow', async (req, res) => {
+  try {
+    const { userId, careId } = req.body;
+
+    // 查找当前用户
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // 查找 careId 是否存在于当前用户的关注列表中
+    const careIndex = user.care.findIndex(care => care.careID.toString() === careId);
+
+    if (careIndex === -1) {
+      return res.status(404).send('You are not following this user');
+    }
+
+    // 从关注列表中移除该 careId
+    user.care.splice(careIndex, 1);
+
+    // 保存更新后的用户数据
+    await user.save();
+
+    res.status(200).send('User unfollowed successfully');
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
 
 module.exports = router;

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
 <html lang="en">
 <head>
     <meta http-equiv="refresh" content="5">
@@ -81,6 +82,13 @@
         .button-secondary:active {
             background-color: #007bb5;
         }
+
+        #user-id {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -89,7 +97,15 @@
     <h1>Choose Chat Method</h1>
     <button class="button" onclick="window.location.href='grouplist.html'">群聊</button>
     <button class="button button-secondary" onclick="window.location.href='carelist.html'">私聊</button>
+    <div id="user-id">Your ID: <span id="id-value"></span></div>
 </div>
+
+<script>
+    const token = localStorage.getItem('token'); // Get the JWT token from localStorage
+    const decodedToken = jwt_decode(token);
+    const userId = decodedToken.userId;
+    document.getElementById('id-value').textContent = userId;
+</script>
 
 </body>
 </html>
