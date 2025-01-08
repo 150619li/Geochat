@@ -86,8 +86,11 @@
         #user-id {
             margin-top: 20px;
             font-size: 18px;
-            color: #333;
-            font-weight: bold;
+            color: #009688; 
+            font-weight: 700; 
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-style: normal; 
+            text-decoration: none; 
         }
     </style>
 </head>
@@ -97,14 +100,17 @@
     <h1>Choose Chat Method</h1>
     <button class="button" onclick="window.location.href='grouplist.html'">群聊</button>
     <button class="button button-secondary" onclick="window.location.href='carelist.html'">私聊</button>
-    <div id="user-id">Your ID: <span id="id-value"></span></div>
+    <button id="show-id-btn" class="button button-secondary">My ID</button>
 </div>
 
 <script>
     const token = localStorage.getItem('token'); // Get the JWT token from localStorage
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
-    document.getElementById('id-value').textContent = userId;
+    const showIdButton = document.getElementById('show-id-btn');
+    showIdButton.addEventListener('click', () => {
+        alert(`Your ID: ${userId}`); // 弹出包含用户ID的提示框
+    });
 </script>
 
 </body>

@@ -80,6 +80,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
     }
 
     .group:hover {
@@ -155,6 +156,32 @@
       transition: transform 0.1s, box-shadow 0.1s;
     }
 
+    .leave-group {
+      background-color: #d46e67;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      position: absolute; /* 设置为绝对定位 */
+      bottom: 10px; /* 距离父元素底部10px */
+      right: 10px; /* 距离父元素右边10px */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transform: translateY(1px);
+    }
+
+    .leave-group:hover {
+      background-color: #7c2323;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transform: translateY(1px);
+    }
+
+    .leave-group:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
     /* Button colors */
     /*#create-group {
       background-color: hsl(161, 72%, 41%); 
